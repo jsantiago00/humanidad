@@ -999,19 +999,61 @@ const DISCOVERIES = [
   {id:'internet', name:'Internet', emoji:'🌐', prereq:['computacion','telegrafo_radio'], popMin:250, knowledgeMin:44000, baseChance:0.0006,
     flavor:['conectan sus computadoras en una red que abarca todo el mundo.']},
   {id:'satelites', name:'Satélites y viajes espaciales', emoji:'🛰️', prereq:['coheteria','computacion'], popMin:260, knowledgeMin:50000, baseChance:0.0005,
-    flavor:['ponen satélites en órbita y mandan gente al espacio.']}
+    flavor:['ponen satélites en órbita y mandan gente al espacio.']},
+  // ----- juegos y deportes -----
+  {id:'juegos_pelota', name:'Juegos y deportes', emoji:'🏐', prereq:['division_trabajo'], popMin:50, baseChance:0.0025,
+    flavor:['inventan los primeros juegos con reglas: equipos, turnos y un ganador.']},
+  {id:'juegos_atleticos', name:'Competencias entre pueblos', emoji:'🏅', prereq:['juegos_pelota','escritura'], popMin:120, baseChance:0.0015,
+    flavor:['organizan las primeras competencias con atletas de otros pueblos; mientras duran, se suspenden las peleas.']},
+  {id:'deporte_masivo', name:'Deporte profesional', emoji:'🏟️', prereq:['juegos_atleticos','ferrocarril','telegrafo_radio'], popMin:200, knowledgeMin:22000, baseChance:0.0012,
+    flavor:['levantan estadios, arman ligas profesionales y transmiten los partidos por radio.']},
+  // ----- la era atómica -----
+  {id:'fisica_nuclear', name:'Física nuclear', emoji:'⚛️', prereq:['electricidad','metodo_cientifico'], popMin:220, knowledgeMin:34000, baseChance:0.0008,
+    flavor:['descubren que el núcleo del átomo guarda una energía enorme: nace la física nuclear.']},
+  {id:'armas_nucleares', name:'Armas nucleares', emoji:'☢️', prereq:['fisica_nuclear','aviacion'], popMin:240, knowledgeMin:38000, baseChance:0.0007,
+    flavor:['fabrican la bomba atómica: por primera vez, un pueblo puede borrar una ciudad entera en un instante.']},
+  {id:'energia_nuclear', name:'Centrales nucleares', emoji:'⚡', prereq:['fisica_nuclear'], popMin:220, knowledgeMin:40000, baseChance:0.0008,
+    flavor:['encienden la primera central nuclear: una sola planta ilumina regiones enteras.']},
+  // ----- información, vida e inteligencia -----
+  {id:'energias_limpias', name:'Energías renovables', emoji:'🌬️', prereq:['electricidad','computacion'], popMin:220, knowledgeMin:48000, baseChance:0.0007,
+    flavor:['llenan el territorio de molinos de viento y paneles solares, y dejan de quemar tanto petróleo.']},
+  {id:'biotecnologia', name:'Ingeniería genética', emoji:'🧬', prereq:['medicina_moderna','computacion'], popMin:240, knowledgeMin:52000, baseChance:0.0006,
+    flavor:['aprenden a leer y editar el código de la vida: cultivos más resistentes y curas para males incurables.']},
+  {id:'inteligencia_artificial', name:'Inteligencia artificial', emoji:'🤖', prereq:['computacion','internet'], popMin:250, knowledgeMin:56000, baseChance:0.0006,
+    flavor:['crean máquinas que aprenden solas: nace la inteligencia artificial, y enseguida empieza a ayudar a investigar.']},
+  {id:'estacion_orbital', name:'Estación espacial', emoji:'🏗️', prereq:['satelites'], popMin:260, knowledgeMin:60000, baseChance:0.0006,
+    flavor:['arman una estación en órbita donde vive gente todo el año.']},
+  {id:'base_lunar', name:'Base en la Luna', emoji:'🌕', prereq:['estacion_orbital','energia_nuclear'], popMin:260, knowledgeMin:70000, baseChance:0.0005,
+    flavor:['llegan a la Luna y levantan la primera base permanente.']},
+  {id:'ia_general', name:'Inteligencia artificial general', emoji:'🧠', prereq:['inteligencia_artificial','biotecnologia'], popMin:260, knowledgeMin:80000, baseChance:0.0005,
+    flavor:['crean una inteligencia que piensa como una persona, pero mil veces más rápido: desde ahora, las máquinas también inventan.']},
+  {id:'fusion', name:'Fusión nuclear', emoji:'☀️', prereq:['energia_nuclear','inteligencia_artificial'], popMin:260, knowledgeMin:100000, baseChance:0.0005,
+    flavor:['encienden un pequeño sol artificial: la energía deja de ser un problema.']},
+  {id:'nanotecnologia', name:'Nanotecnología', emoji:'💠', prereq:['biotecnologia','ia_general'], popMin:260, knowledgeMin:115000, baseChance:0.0005,
+    flavor:['construyen máquinas del tamaño de una molécula, capaces de reparar cuerpos y fabricar casi cualquier cosa.']},
+  {id:'colonia_marte', name:'Colonia en Marte', emoji:'🔴', prereq:['base_lunar','fusion'], popMin:260, knowledgeMin:130000, baseChance:0.0005,
+    flavor:['fundan la primera ciudad en Marte: la humanidad ya vive en dos planetas.']},
+  {id:'ascensor_espacial', name:'Ascensor espacial', emoji:'🗼', prereq:['estacion_orbital','nanotecnologia'], popMin:260, knowledgeMin:160000, baseChance:0.0005,
+    flavor:['tienden un cable desde el suelo hasta la órbita: subir al espacio pasa a ser como tomar un tren.']},
+  {id:'terraformacion', name:'Terraformación', emoji:'🌱', prereq:['colonia_marte','nanotecnologia'], popMin:260, knowledgeMin:190000, baseChance:0.0004,
+    flavor:['empiezan a transformar Marte: le dan aire, agua y sus primeros bosques. Con lo aprendido, también curan el clima de la Tierra.']},
+  {id:'viaje_interestelar', name:'Naves interestelares', emoji:'✨', prereq:['colonia_marte','fusion','ia_general'], popMin:260, knowledgeMin:240000, baseChance:0.0004,
+    flavor:['lanzan la primera nave hacia otra estrella, con una tripulación que no va a ver el final del viaje.']}
 ];
 const DISC_BY_ID = {}; for (const d of DISCOVERIES) DISC_BY_ID[d.id]=d;
 const ICONIC_TECHS = new Set(['brujula','metodo_cientifico','maquina_vapor','ferrocarril','barco_vapor','medicina_moderna','electricidad','telegrafo_radio','motor_combustion','aviacion','computacion','coheteria','internet','satelites','fuego','herramientas_piedra','agricultura','domesticacion_animales','rueda','navegacion','escritura','metalurgia_bronce','metalurgia_hierro','religion_organizada','gobierno_centralizado','leyes_escritas','moneda','imprenta','construccion_naval','polvora','artilleria']);
 const KEY_TECHS = new Set(['maquina_vapor','ferrocarril','electricidad','aviacion','computacion','internet','agricultura','escritura','metalurgia_bronce','metalurgia_hierro','moneda','imprenta','navegacion','construccion_naval','polvora','artilleria']);
+for (const id of ['juegos_pelota','fisica_nuclear','armas_nucleares','energia_nuclear','energias_limpias','biotecnologia','inteligencia_artificial','estacion_orbital','base_lunar','ia_general','fusion','nanotecnologia','colonia_marte','ascensor_espacial','terraformacion','viaje_interestelar','deporte_masivo']) ICONIC_TECHS.add(id);
+for (const id of ['armas_nucleares','inteligencia_artificial','fusion']) KEY_TECHS.add(id);
 
 // Capa 2 procedural sin techo (adyacente posible, Kauffman / W. Brian Arthur)
-const CAMPOS = ["la física","la química","la biología","la medicina","la astronomía","las matemáticas","la ingeniería","la energía",
-  "el cómputo","los materiales","las comunicaciones","la navegación","la agronomía","la genética","la mente humana"];
-const ETAPAS = ["sientan las primeras bases teóricas de","logran la primera aplicación práctica de","refinan y perfeccionan sus conocimientos sobre",
-  "empiezan a enseñar de forma sistemática","combinan con otras disciplinas los saberes sobre","automatizan procesos basados en",
-  "empiezan a cuestionar los límites de lo que creían saber sobre","logran avances que ni ellos mismos terminan de entender sobre"];
-const PROC_BASE_KNOWLEDGE = 60000, PROC_BASE_POP = 190, PROC_KNOWLEDGE_GROWTH = 1.5, PROC_POP_GROWTH = 1.15;
+const CAMPOS = ["la energía de las estrellas","la materia oscura","la vida en otros mundos","la mente humana","la antimateria",
+  "la computación cuántica","la ingeniería de planetas","la longevidad","el espacio profundo","la gravedad","las máquinas pensantes",
+  "los materiales imposibles","la conciencia","el clima de los planetas","la física del tiempo"];
+const ETAPAS = ["logran dominar","llevan a todo el sistema solar sus avances sobre","descubren leyes nuevas sobre",
+  "ponen al alcance de todos lo que saben sobre","combinan con sus inteligencias artificiales los saberes sobre",
+  "superan límites que parecían eternos en","empiezan a comprender el fondo último de"];
+const PROC_BASE_KNOWLEDGE = 270000, PROC_BASE_POP = 200, PROC_KNOWLEDGE_GROWTH = 1.25, PROC_POP_GROWTH = 1.04;
 
 function has(n,id){ return !!n.disc[id]; }
 function techCount(n){ return Object.keys(n.disc).length + n.proc; }
@@ -1028,23 +1070,26 @@ function agriMult(n){
   // densidades agrarias reales: de ~5 a ~50 personas por km² (y muchas más con la revolución verde)
   return 80*(1 + (d.maquina_vapor?0.4:0) + (d.agricultura_mecanizada?3:0) + (d.electricidad?0.5:0) + (d.computacion?0.8:0) + (d.domesticacion_animales?0.35:0) + (d.domesticacion_carga?0.2:0) + (d.calendario_astronomia?0.2:0)
     + (d.metalurgia_cobre?0.1:0) + (d.metalurgia_bronce?0.15:0) + (d.metalurgia_hierro?0.25:0)
-    + (d.escritura?0.1:0) + (d.comercio_mercados?0.1:0) + n.proc*0.05);
+    + (d.escritura?0.1:0) + (d.comercio_mercados?0.1:0) + n.proc*0.05
+    + (d.energia_nuclear?0.3:0) + (d.biotecnologia?1.2:0) + (d.fusion?1.5:0) + (d.nanotecnologia?0.8:0) + (d.terraformacion?1:0)) * climateF();
 }
+// el calentamiento global castiga las cosechas
+function climateF(){ return S && S.warming ? clamp(1 - 0.07*S.warming, 0.6, 1) : 1; }
 function foodStorage(n){ const d=n.disc; return clamp((d.cesteria?0.12:0)+(d.alfareria?0.12:0)+(d.agricultura?0.15:0)+(d.domesticacion_animales?0.15:0),0,0.5); }
 function shelterMit(n){ const d=n.disc; return clamp((d.fuego?0.3:0)+(d.herramientas_piedra?0.1:0)+(d.construccion_madera?0.15:0)+(d.construccion_piedra?0.15:0)+(d.curtido_cuero?0.1:0)+(d.textiles?0.05:0)+(d.electricidad?0.08:0),0,0.93); }
-function medMit(n){ const d=n.disc; return clamp((d.medicina_hierbas?0.25:0)+(d.escritura?0.05:0)+(d.leyes_escritas?0.05:0)+(d.medicina_moderna?0.45:0)+n.proc*0.03,0,0.92); }
+function medMit(n){ const d=n.disc; return clamp((d.medicina_hierbas?0.25:0)+(d.escritura?0.05:0)+(d.leyes_escritas?0.05:0)+(d.medicina_moderna?0.45:0)+(d.biotecnologia?0.04:0)+(d.nanotecnologia?0.03:0)+n.proc*0.03,0,0.95); }
 function milTech(n){ const d=n.disc;
   return 1 + (d.herramientas_piedra?0.1:0) + (d.metalurgia_cobre?0.15:0) + (d.metalurgia_bronce?0.25:0) + (d.metalurgia_hierro?0.35:0)
     + (d.domesticacion_carga?0.12:0) + (d.rueda?0.05:0) + (d.ejercito_permanente?0.25:0) + (d.polvora?0.3:0) + (d.artilleria?0.4:0)
-    + (d.ferrocarril?0.15:0) + (d.motor_combustion?0.5:0) + (d.aviacion?0.6:0) + (d.computacion?0.3:0) + (d.coheteria?0.4:0) + n.proc*0.04; }
+    + (d.ferrocarril?0.15:0) + (d.motor_combustion?0.5:0) + (d.aviacion?0.6:0) + (d.computacion?0.3:0) + (d.coheteria?0.4:0) + (d.armas_nucleares?0.6:0) + (d.inteligencia_artificial?0.4:0) + (d.ia_general?0.6:0) + n.proc*0.04; }
 // alcance político: cuán lejos de la capital puede un asentamiento seguir siendo parte de la nación
 function nationReach(n){ return nationReachRaw(n)*KF(); }
 function nationReachRaw(n){ const d=n.disc;
   return 10 + (d.rueda?3:0) + (d.domesticacion_carga?4:0) + (d.navegacion?2:0) + (d.escritura?6:0) + (d.gobierno_centralizado?8:0)
-    + (d.leyes_escritas?3:0) + (d.moneda?3:0) + (d.imprenta?6:0) + (d.ferrocarril?14:0) + (d.telegrafo_radio?8:0) + (d.autopistas?10:0) + (d.aviacion?10:0) + (d.internet?12:0) + n.proc*1.5; }
+    + (d.leyes_escritas?3:0) + (d.moneda?3:0) + (d.imprenta?6:0) + (d.ferrocarril?14:0) + (d.telegrafo_radio?8:0) + (d.autopistas?10:0) + (d.aviacion?10:0) + (d.internet?12:0) + (d.inteligencia_artificial?6:0) + (d.ascensor_espacial?6:0) + n.proc*1.5; }
 // número de Dunbar: tamaño máximo de un grupo antes de partirse, se amplía con instituciones
 function dunbarCap(n){ const d=n.disc;
-  let c = 150; if (d.division_trabajo) c=280; if (d.escritura) c=450; if (d.gobierno_centralizado) c=700; if (d.leyes_escritas) c=900; if (d.maquina_vapor) c=1400; if (d.electricidad) c=2000;
+  let c = 150; if (d.division_trabajo) c=280; if (d.escritura) c=450; if (d.gobierno_centralizado) c=700; if (d.leyes_escritas) c=900; if (d.maquina_vapor) c=1400; if (d.electricidad) c=2000; if (d.inteligencia_artificial) c=2600; if (d.fusion) c=3000;
   return c + n.proc*80; }
 
 // =====================================================================
@@ -1712,7 +1757,7 @@ function knowledgeStep(){
     // antes de la agricultura, las ideas nuevas son rarísimas (Edad de Piedra)
     const ritmo = (S.params.ritmo || 1) * (n.disc.agricultura ? 1 : (S.params.paleo!=null ? S.params.paleo : 1));
     // Kremer (1993): el ritmo de innovación crece con la población real
-    const kremer = (1 + 0.35*Math.log10(Math.max(1, n.pop/100))) * (n.disc.imprenta?1.3:1) * (n.disc.metodo_cientifico?1.5:1) * (n.disc.electricidad?1.2:1) * (n.disc.computacion?1.8:1) * (n.disc.internet?1.5:1);
+    const kremer = (1 + 0.35*Math.log10(Math.max(1, n.pop/100))) * (n.disc.imprenta?1.3:1) * (n.disc.metodo_cientifico?1.5:1) * (n.disc.electricidad?1.2:1) * (n.disc.computacion?1.8:1) * (n.disc.internet?1.5:1) * (n.disc.fisica_nuclear?1.1:1) * (n.disc.inteligencia_artificial?1.4:1) * (n.disc.ia_general?1.6:1);
     n.know += (n.avgI/45)*(1+0.03*count)*clamp(Math.sqrt(U(n.pop))/7, 0.35, 2)*sabio*ritmo*kremer;
     const intelF = clamp(n.avgI/50,0.3,3), popF = clamp(Math.sqrt(U(n.pop))/4,0.4,3);
     // la geografía manda: se cultiva donde hay tierras aptas (valles fluviales templados), se riega donde hay ríos
@@ -1721,10 +1766,11 @@ function knowledgeStep(){
       for (let i=0;i<o.length;i+=2){ const x=cx+o[i], y=cy+o[i+1]; if (x<0||y<0||x>=W||y>=H) continue; const j=y*W+x; if (WORLD.land[j]<0) continue; s+=WORLD.agF[j]; k++; if (WORLD.river[j]) river=true; if (WORLD.biome[j]===B_GRASS||WORLD.biome[j]===B_HILLS) grass++; }
       if (k && s/k>bestAg){ bestAg=s/k; n._agBand=b; } }
     const geoF = {agricultura: Math.pow(clamp((bestAg-0.5)/0.6,0,1.3),1.5), irrigacion: river?1:0, domesticacion_animales: grass>0?1:0.2};
+    const aiF = (n.disc.inteligencia_artificial?1.4:1) * (n.disc.ia_general?1.6:1);
     for (const item of DISCOVERIES){
       if (n.disc[item.id] || !prereqsOk(n,item)) continue;
       const gf = geoF[item.id]!=null ? geoF[item.id] : 1; if (!gf) continue;
-      const p = clamp(item.baseChance*intelF*popF*sabio*ritmo*gf*kremer, 0, 0.3);
+      const p = clamp(item.baseChance*intelF*popF*sabio*ritmo*gf*kremer*aiF, 0, 0.3);
       if (rng()<p){
         n.disc[item.id]=S.year;
         const first = !S.firsts[item.id];
@@ -1733,7 +1779,9 @@ function knowledgeStep(){
           const wh = cb ? whereName(Math.round(cb.x), Math.round(cb.y)) : '';
           S.firsts[item.id] = {nation:n.id, year:S.year, name:n.name, color:n.color, where:wh};
           let who = '';
-          if (ICONIC_TECHS.has(item.id) && cb){
+          if (n.aiName && item.id!=='inteligencia_artificial' && chance(n.disc.ia_general ? 0.85 : 0.3)){
+            who = ` Lo diseña <b>${n.aiName}</b>, la inteligencia artificial de ${NM(n)}.`;
+          } else if (ICONIC_TECHS.has(item.id) && cb){
             const t = sampleTraits(cb); t[1] = tailValue(cb, 1, sumAge(cb,15,60));
             const inv = makeFigure(cb, {traits:t, role:'inventor', event:`Se le atribuye ${item.name.toLowerCase()}, la primera vez en el mundo.`});
             who = ` Se le atribuye a ${FN(inv)}.`; S.firsts[item.id].by = inv.id;
@@ -1747,10 +1795,10 @@ function knowledgeStep(){
     }
     // capa procedural
     const req = {k:PROC_BASE_KNOWLEDGE*Math.pow(PROC_KNOWLEDGE_GROWTH,n.proc), p:PROC_BASE_POP*Math.pow(PROC_POP_GROWTH,n.proc)};
-    if (n.know>=req.k && n.pop>=SC(req.p) && rng()<clamp(0.004*intelF*popF,0,0.1)){
-      const stage = ETAPAS[Math.min(ETAPAS.length-1, Math.floor(n.proc/CAMPOS.length))];
+    if (n.disc.viaje_interestelar && n.know>=req.k && n.pop>=SC(req.p) && rng()<clamp(0.004*intelF*popF*aiF,0,0.2)){
       n.proc++;
-      log(`<span class="ico">🧪</span>${NM(n,true)} ${stage} ${pick(CAMPOS)}.`, 'tecno', [n.id], once('proc'+n.proc));
+      const aiTxt = n.aiName && chance(0.5) ? ` Guiados por ${n.aiName},` : '';
+      log(`<span class="ico">🧪</span>${aiTxt ? aiTxt+' '+NM(n) : NM(n,true)} ${pick(ETAPAS)} ${pick(CAMPOS)}.`, 'tecno', [n.id], once('proc'+n.proc));
     }
   }
   // difusión: contactos en paz se pasan técnicas; el comercio lo acelera
@@ -1791,6 +1839,14 @@ function knowledgeStep(){
 }
 function onDiscovery(n, id){
   if (id==='agricultura') n.settledLogged = n.settledLogged || false;
+  // la inteligencia artificial de cada nación tiene nombre propio
+  if (id==='inteligencia_artificial' && !n.aiName){
+    n.aiName = wordFrom(n.culture[1], 2).toUpperCase() + '-' + (1+Math.floor(rng()*9));
+    if (n.pop>=SC(30)) log(`<span class="ico">🤖</span>${NM(n,true)} bautizan <b>${n.aiName}</b> a su inteligencia artificial. Desde ahora trabaja junto a sus científicos.`, 'tecno', [n.id]);
+  }
+  if (id==='ia_general' && n.aiName) n.aiName = n.aiName.replace(/-\d+$/, '') + '-Ω';
+  if (id==='colonia_marte') n.offworld = Math.max(n.offworld||0, 2000);
+  if (id==='viaje_interestelar'){ S.starships = S.starships || []; S.starships.push({nation:n.id, name:wordFrom(n.culture[1],2), arrive:S.year+60+Math.floor(rng()*80), start:S.year}); }
 }
 
 // =====================================================================
@@ -1799,7 +1855,7 @@ function onDiscovery(n, id){
 function disasterStep(){
   const peligro = S.params.peligro/100;
   S.droughts = S.droughts.filter(d=>d.until>=S.year);
-  if (rng() < 0.022*(0.6+peligro)){
+  if (rng() < 0.022*(0.6+peligro)*(1+(S.warming||0)*0.6)){
     const c = pick(WORLD.landCells);
     const d = {x:c%W, y:(c/W)|0, r:Math.max(1.2,(9+rng()*10)*KF()), until:S.year+2+Math.floor(rng()*4)};
     S.droughts.push(d);
@@ -1824,7 +1880,7 @@ function disasterStep(){
       const b=S.bands.get(bid); if (!b) continue;
       for (const o of S.bands.values()){
         if (E.infected.has(o.id) || o.immuneUntil>S.year) continue;
-        const d = dist(b,o), link = d<Math.max(1.2,9*KF()) ? 1 : (tradeLink(bandNation(b),bandNation(o))>0 && d<Math.max(2,30*KF()) ? 0.5 : 0);
+        const d = dist(b,o), nb = bandNation(b), no = bandNation(o), link = d<Math.max(1.2,9*KF()) ? 1 : (nb && no && tradeLink(nb,no)>0 && d<Math.max(2,30*KF()) ? 0.5 : (nb && no && has(nb,'aviacion') && has(no,'aviacion') ? 0.25 : 0));
         if (link && rng()<0.3*link*(o.sedentary?1.3:0.7)) add.push(o.id);
       }
     }
@@ -2175,6 +2231,8 @@ function declarationStep(){
       if (ratio<0.75) p*=0.15; else if (ratio>1.6) p*=1.6;
       if (a.leader){ if (a.leader.trait==='cauto') p*=0.5; if (a.leader.trait==='ambicioso' && ratio>1.3) p*=1.5; if (a.leader.trait==='conciliador') p*=0.4; }
       if (atWar(a)) p*=0.3;
+      if (has(a,'armas_nucleares') && has(b,'armas_nucleares')) p*=0.35;
+      if (r.sportTruce && r.sportTruce>=S.year) p*=0.5;
       if (!chance(p)) continue;
       // el motivo que más pesó
       const terms = [[g*0.8,'g'],[des*30,'d'],[holy*15,'h'],[-r.v,'t'],[ag,'a']].sort((x,y)=>y[0]-x[0]);
@@ -2443,15 +2501,255 @@ function asabiyaStep(){
   }
 }
 
+
+// =====================================================================
+// Era atómica: bombas, represalias, lluvia radiactiva, invierno nuclear y guerra fría
+// =====================================================================
+function nukeStrike(X, Y, w, retal){
+  const targets = Y.bandsArr.filter(b=>b.N>0).sort((a,b)=>b.N-a.N).slice(0,3);
+  if (!targets.length) return false;
+  const b = targets[Math.floor(rng()*targets.length)];
+  S.nukeCount = (S.nukeCount||0)+1; (S.nukeLog = S.nukeLog||[]).push(S.year); if (S.nukeLog.length>50) S.nukeLog.shift(); S.nukeYears = (S.nukeYears||[]).filter(y=>y>S.year-4); S.nukeYears.push(S.year);
+  // un escudo antimisiles guiado por una IA puede derribar el ataque
+  if (has(Y,'ia_general') && chance(0.4)){
+    log(`<span class="ico">🛡️</span>${NM(X,true)} lanzan un misil nuclear contra ${b.place}, pero ${Y.aiName||'la inteligencia artificial'} de ${NM(Y)} lo derriba en el aire.`, 'guerra', [X.id,Y.id], true);
+    return true;
+  }
+  const [,k] = takeFrac(b, 0.4 + rng()*0.2);
+  Y.deathsYear.guerra = (Y.deathsYear.guerra||0) + k;
+  if (w.a===Y.id){ w.casA += k; w.exA += 0.35; } else { w.casB += k; w.exB += 0.35; }
+  (S.fallout = S.fallout || []).push({band:b.id, until:S.year+20});
+  addGrudge(Y.id, X.id, 80);
+  for (const r of S.rel.values()) if ((r.a===X.id || r.b===X.id) && r.state!=='alianza') r.v -= 12;   // el mundo entero condena el ataque
+  S.battleEvents.push({type:'nuke', x:b.x, y:b.y, big:k});
+  const first = once('nuke');
+  const txt = first
+    ? `Por primera vez en la historia se usa un arma nuclear: ${NM(X)} lanzan una bomba atómica sobre ${b.place}, de ${NM(Y)}. Mueren ${fmtN(k)} personas en un instante.`
+    : `${retal ? 'En represalia, ' + NM(X) : NM(X,true)} lanzan una bomba atómica sobre ${b.place}, de ${NM(Y)}: mueren ${fmtN(k)} personas.`;
+  log(`<span class="ico">☢️</span>${txt}`, 'guerra', [X.id,Y.id], true);
+  return true;
+}
+function nuclearStep(){
+  // lluvia radiactiva: durante años, los lugares bombardeados siguen enfermando a su gente
+  if (S.fallout && S.fallout.length){
+    S.fallout = S.fallout.filter(f=>f.until>S.year && S.bands.has(f.band));
+    for (const f of S.fallout){ const b=S.bands.get(f.band); if (!b.N) continue; const n=bandNation(b); const [,k]=takeFrac(b, 0.012); if (n) n.deathsYear.otra=(n.deathsYear.otra||0)+k; }
+  }
+  if (S.nukeWinter && S.nukeWinter>=S.year){
+    for (const b of S.bands.values()){ const n=bandNation(b); const [,k]=takeFrac(b, 0.015); if (n) n.deathsYear.frio=(n.deathsYear.frio||0)+k; }
+  }
+  const belic = S.params.belic/100;
+  for (const w of [...S.wars]){
+    const A=nat(w.a), B=nat(w.b); if (!A||!B||!A.pop||!B.pop) continue;
+    for (const [X,Y,ex,casX,casY] of [[A,B,w.exA,w.casA,w.casB],[B,A,w.exB,w.casB,w.casA]]){
+      if (!has(X,'armas_nucleares')) continue;
+      if (X.pop < SC(60)) continue;                     // solo los estados grandes pueden sostener un arsenal
+      const losing = ex>0.35 || casX > 1.4*casY + SC(5);
+      // tabú nuclear: cada bomba reciente hace mucho más difícil que alguien se anime a tirar otra
+      const recent = (S.nukeLog||[]).filter(y=>y>S.year-80).length;
+      let p = (losing ? 0.012 : 0.0008) * (0.5+belic) / (1 + recent*1.5) * (S.nukeWinter>=S.year-150 ? 0.2 : 1);
+      if (X.leader){ const t=X.leader.trait; if (t==='agresivo') p*=2; else if (t==='cauto') p*=0.3; else if (t==='conciliador') p*=0.15; }
+      if (has(Y,'armas_nucleares')) p*=0.35;           // destrucción mutua asegurada
+      const r = getRel(X.id,Y.id); if (r.treaty && r.treaty>=S.year) p*=0.2;
+      if (!chance(p)) continue;
+      if (nukeStrike(X, Y, w, false) && has(Y,'armas_nucleares') && Y.pop && chance(0.7)) nukeStrike(Y, X, w, true);
+      break;
+    }
+  }
+  // demasiadas explosiones juntas tapan el sol
+  if ((S.nukeYears||[]).filter(y=>y>S.year-4).length>=4 && !(S.nukeWinter>=S.year-40)){
+    S.nukeWinter = S.year+5;
+    log(`<span class="ico">🌫️</span>El humo de tantas explosiones tapa el sol: empieza un invierno nuclear en todo el mundo.`, 'desastre', [], true);
+  }
+  // guerra fría: potencias nucleares enemistadas que no se atacan, pero compiten en todo
+  if (S.year%3) return;
+  const nukes = [...S.nations.values()].filter(n=>n.pop && has(n,'armas_nucleares'));
+  for (let i=0;i<nukes.length;i++) for (let j=i+1;j<nukes.length;j++){
+    const a=nukes[i], b=nukes[j]; if (!S.contacts.has(pk(a.id,b.id))) continue;
+    const r = getRel(a.id,b.id);
+    if (!r.cold && r.state!=='guerra' && r.v < -15 && a.pop>=SC(100) && b.pop>=SC(100) && !(r.coldEnd>S.year-120)){
+      r.cold = S.year;
+      log(`<span class="ico">🧊</span>Empieza una guerra fría entre ${NM(a)} y ${NM(b)}: no se atacan, pero compiten en todo, del espacio al deporte.`, 'politica', [a.id,b.id], once('guerra_fria'));
+    } else if (r.cold){
+      if (r.state==='guerra'){ r.cold=null; r.coldEnd=S.year; continue; }
+      if (r.v > 10){ r.cold=null; r.coldEnd=S.year; log(`<span class="ico">🕊️</span>Termina la guerra fría entre ${NM(a)} y ${NM(b)}.`, 'politica', [a.id,b.id]); continue; }
+      a.know *= 1.002; b.know *= 1.002;              // la carrera espacial acelera la ciencia
+      if (chance(0.03)){
+        if (chance(0.5)){ r.v += 30; r.treaty = S.year+60; r.cold=null; r.coldEnd=S.year;
+          log(`<span class="ico">📜</span>Tras una crisis que dejó al mundo al borde de la guerra nuclear, ${NM(a)} y ${NM(b)} firman un tratado de desarme.`, 'politica', [a.id,b.id], true); }
+        else { r.v -= 25; addGrudge(a.id,b.id,20); addGrudge(b.id,a.id,20);
+          log(`<span class="ico">🚀</span>Crisis de los misiles entre ${NM(a)} y ${NM(b)}: los dos apuntan sus bombas y el mundo contiene la respiración.`, 'politica', [a.id,b.id], true);
+          if (chance(0.3)){ r.cold=null; r.coldEnd=S.year; declareWar(a, b, 'cuando la crisis de los misiles se sale de control', true); } }
+      }
+    }
+  }
+}
+
+// =====================================================================
+// Crisis de la era moderna: calentamiento global, crisis económicas e inteligencias artificiales fuera de control
+// =====================================================================
+function crisisStep(){
+  let emit = 0, heal = 0;
+  for (const n of S.nations.values()){
+    if (!n.pop) continue;
+    if (has(n,'motor_combustion')) emit += U(n.pop)/1000 * (has(n,'energias_limpias')?0.3:1) * (has(n,'fusion')?0.08:1);
+    if (has(n,'terraformacion')) heal += 0.004; else if (has(n,'nanotecnologia')) heal += 0.001;
+  }
+  const w0 = S.warming || 0;
+  S.warming = clamp(w0 + emit*0.0025 - w0*0.002 - heal, 0, 5);
+  const lvl = Math.floor(S.warming), prev = S.warmLevel || 0;
+  if (lvl > prev){
+    S.warmLevel = lvl;
+    const T = {1:'El planeta ya está 1 °C más caliente que antes de las fábricas: los veranos se vuelven más duros.',
+               2:'El calentamiento global llega a 2 °C: sequías, incendios y olas de calor castigan las cosechas.',
+               3:'Con 3 °C de más, el mar sube y los glaciares se derriten: las costas empiezan a inundarse.',
+               4:'El planeta está 4 °C más caliente: grandes regiones se vuelven casi imposibles de habitar.'}[lvl];
+    if (T) log(`<span class="ico">🌡️</span>${T}`, 'desastre', [], true);
+  } else if (prev>=2 && S.warming < prev-0.8 && !S.flags.climaSalvado){
+    S.flags.climaSalvado = true; S.warmLevel = Math.floor(S.warming);
+    log(`<span class="ico">🌍</span>Por primera vez en siglos, el planeta empieza a enfriarse: la energía limpia y la ciencia frenan el calentamiento.`, 'sociedad', [], true);
+  }
+  // el mar sube: inundaciones costeras
+  if (S.warming>2.5 && chance(0.03*(S.warming-2.4))){
+    const cand = [...S.bands.values()].filter(b=>b.N>0 && WORLD.coast[bandCell(b)]);
+    if (cand.length){ const b=pick(cand), n=bandNation(b); const [,k]=takeFrac(b, 0.15+rng()*0.15);
+      if (n){ n.deathsYear.otra=(n.deathsYear.otra||0)+k; log(`<span class="ico">🌊</span>El mar sube e inunda ${b.place}, de ${NM(n)}: ${fmtN(k)} personas mueren o pierden todo.`, 'desastre', [n.id]); } }
+  }
+  // crisis económica mundial: golpea a los países industriales conectados por el comercio
+  const ind = [...S.nations.values()].filter(n=>n.pop && has(n,'maquina_vapor') && has(n,'telegrafo_radio'));
+  if (ind.length>=3 && chance(0.012) && !(S.lastCrash>S.year-35)){
+    S.lastCrash = S.year;
+    const indSet = new Set(ind.map(n=>n.id)); for (const r of S.rel.values()) if (indSet.has(r.a) && indSet.has(r.b)) r.v -= 10;
+    for (const n of ind){ n.asabiya = clamp(n.asabiya-0.12, 0.03, 0.97); for (const b of n.bandsArr){ const [,k]=takeFrac(b, 0.006); n.deathsYear.hambre=(n.deathsYear.hambre||0)+k; } }
+    log(`<span class="ico">📉</span>Estalla una crisis económica mundial: cierran fábricas y bancos en ${ind.length} países, y crece el descontento.`, 'sociedad', ind.map(n=>n.id), once('crisis_economica'));
+  }
+  // una inteligencia artificial se sale de control (más probable en sociedades poco cooperativas)
+  for (const n of S.nations.values()){
+    if (!n.pop || !has(n,'ia_general')) continue;
+    if (!chance(0.0004*clamp(1+(50-n.avgC)/25, 0.3, 3))) continue;
+    n.know *= 0.9; n.asabiya = clamp(n.asabiya-0.15, 0.03, 0.97);
+    for (const b of n.bandsArr){ const [,k]=takeFrac(b, 0.02); n.deathsYear.otra=(n.deathsYear.otra||0)+k; }
+    log(`<span class="ico">⚠️</span>${n.aiName||'La inteligencia artificial'} de ${NM(n)} empieza a tomar decisiones por su cuenta: apaga redes, paraliza el país durante meses y cuesta mucho volver a controlarla.`, 'desastre', [n.id], once('ia_rebelde') || n.pop>=S.popTotal*0.15);
+  }
+}
+
+// =====================================================================
+// Deportes: cada pueblo inventa los suyos, se contagian por contacto y acercan a los rivales
+// =====================================================================
+const SPORT_KINDS = ['un juego en el que dos equipos se disputan una pelota de cuero con los pies',
+  'un juego de pelota de goma que se golpea con la cadera y no puede tocar el suelo','carreras entre los mejores corredores de cada aldea',
+  'luchas cuerpo a cuerpo dentro de un círculo de tierra','un juego con palos curvos y una bocha de madera','carreras de canoas',
+  'un juego a caballo en el que se persigue una pelota','un juego de puntería con lanzas y blancos de paja',
+  'un juego en el que la pelota se lanza con la mano a un aro alto','un juego de pelota que se pasa por encima de una red'];
+// vecinos en paz, salteando contactos con naciones que ya desaparecieron este año
+function peaceNeighbors(n){ const out=[];
+  for (const ct of S.contacts.values()){ if (ct.a!==n.id && ct.b!==n.id) continue; const o=nat(ct.a===n.id?ct.b:ct.a); if (!o || !o.alive || !o.pop) continue;
+    if (getRel(ct.a,ct.b).state!=='guerra') out.push(o); }
+  return out; }
+function sportsStep(){
+  S.sports = S.sports || [];
+  for (const n of S.nations.values()){
+    if (!n.pop || !has(n,'juegos_pelota') || n.sport!=null) continue;
+    // primero intentan copiar el juego de un vecino; si no, inventan uno propio
+    const nb = peaceNeighbors(n).filter(o=>o.sport!=null);
+    if (nb.length && (chance(0.75) || S.sports.length>=24)){ n.sport = pick(nb).sport; continue; }
+    if (S.sports.length>=24){ n.sport = Math.floor(rng()*S.sports.length); continue; }
+    const sp = {name:'el '+wordFrom(n.culture[1], 2).toLowerCase(), kind:pick(SPORT_KINDS), nation:n.id, nname:n.name, year:S.year, wins:{}};
+    n.sport = S.sports.length; S.sports.push(sp);
+    if (n.pop>=SC(10)) log(`<span class="ico">🏐</span>${NM(n,true)} inventan ${sp.name}: ${sp.kind}.`, 'sociedad', [n.id], S.sports.length===1);
+  }
+  if (!S.sports.length) return;
+  // juegos entre pueblos: una tregua y relaciones más amables
+  for (const host of S.nations.values()){
+    if (!host.pop || !has(host,'juegos_atleticos') || atWar(host) || !chance(0.012)) continue;
+    const part = [host, ...peaceNeighbors(host).filter(o=>has(o,'juegos_pelota') && !warBetween(o.id,host.id))].slice(0,7);
+    if (part.length<3) continue;
+    const cb = S.bands.get(host.capital) || host.bandsArr[0]; if (!cb) continue;
+    const sp = S.sports[host.sport!=null ? host.sport : 0];
+    let win=null, best=-1; for (const o of part){ const sc=o.avgF*0.6+o.avgR*0.4+rng()*25; if (sc>best){ best=sc; win=o; } }
+    for (let i=0;i<part.length;i++) for (let j=i+1;j<part.length;j++){ const r=getRel(part[i].id,part[j].id); r.v=Math.min(100, r.v+6); r.sportTruce=S.year+6; }
+    const first = once('juegos');
+    log(`<span class="ico">🏅</span>${first?'Se celebran los primeros juegos entre pueblos de la historia: ':''}${NM(host,!first)} reciben en ${cb.place} a ${part.length-1} pueblos para competir en ${sp.name}. Ganan ${NM(win)}.`, 'sociedad', part.map(o=>o.id), first);
+  }
+  // campeonato mundial cada 4 años
+  if (S.year%4===0){
+    const pro = [...S.nations.values()].filter(n=>n.pop && has(n,'deporte_masivo') && !(S.nukeWinter>=S.year)).sort((a,b)=>b.pop-a.pop).slice(0,32);
+    if (pro.length>=4){
+      const votes = {}; for (const n of pro) if (n.sport!=null) votes[n.sport]=(votes[n.sport]||0)+1;
+      const si = +Object.keys(votes).sort((a,b)=>votes[b]-votes[a])[0], sp = S.sports[si];
+      const peace = pro.filter(n=>!atWar(n)), host = pick(peace.length?peace:pro), cb = S.bands.get(host.capital) || host.bandsArr[0];
+      let win=null, best=-1; for (const o of pro){ const sc=Math.pow(U(o.pop),0.25)*(o.avgF/50)*(0.7+rng()*0.6); if (sc>best){ best=sc; win=o; } }
+      sp.wins[win.id] = (sp.wins[win.id]||0)+1; const titles = sp.wins[win.id];
+      const set = new Set(pro.map(n=>n.id)); for (const r of S.rel.values()) if (set.has(r.a) && set.has(r.b)) r.v = Math.min(100, r.v+3);
+      const first = once('mundial');
+      let star = '';
+      const wb = S.bands.get(win.capital) || win.bandsArr[0];
+      if (wb && (first || titles===3 || chance(0.15))){
+        const t = sampleTraits(wb); t[0] = tailValue(wb, 0, sumAge(wb,18,35));
+        const f = makeFigure(wb, {traits:t, edad:sampleAge(wb,19,32), role:'deportista', event:`Lleva a ${NM(win)} al título mundial de ${sp.name}.`});
+        star = ` La gran figura del torneo es ${FN(f)}.`;
+      }
+      const tit = titles===1 ? 'primer título' : (titles===2 ? 'segundo título' : (titles===3 ? 'tercer título' : `título número ${titles}`));
+      log(`<span class="ico">🏆</span>${first?'Se juega el primer campeonato mundial de la historia':'Campeonato mundial'} ${sp.name.replace(/^el /,'del ')}${cb?' en '+cb.place:''}, con ${pro.length} naciones: ${NM(win)} ganan su ${tit}.${star}`, 'sociedad', [win.id, host.id], first);
+    }
+  }
+}
+
+// =====================================================================
+// La humanidad fuera de la Tierra: colonias, naves interestelares
+// =====================================================================
+function spaceStep(){
+  let off = 0;
+  for (const n of S.nations.values()){
+    if (!n.pop || !n.offworld) continue;
+    const K = Math.max(1000, n.pop * (0.01 + (has(n,'ascensor_espacial')?0.05:0) + (has(n,'terraformacion')?0.35:0) + Math.min(0.6, n.proc*0.02)));
+    n.offworld += n.offworld*0.03*(1-n.offworld/K);
+    off += n.offworld;
+  }
+  S.offworld = off;
+  const m = S.offMilestone || 1e4;
+  if (off >= m){
+    S.offMilestone = m*10;
+    log(`<span class="ico">🪐</span>Ya viven ${fmtN(m)} personas fuera de la Tierra, entre la Luna, Marte y las estaciones espaciales.`, 'sociedad', [], m>=1e5);
+  }
+  // Marte y las estaciones crecen hasta que quieren gobernarse solos
+  for (const n of S.nations.values()){
+    if (!n.pop || n.marsFree || (n.offworld||0) < 1e6 || !chance(0.002)) continue;
+    n.marsFree = true; n.offworld *= 0.4;
+    log(`<span class="ico">🔴</span>Los colonos marcianos de ${NM(n)} se declaran independientes: Marte ya no obedece a la Tierra.`, 'politica', [n.id], once('marte_libre'));
+  }
+  // nuevas naves hacia otras estrellas: una expansión que no se termina
+  S.starships = S.starships || [];
+  for (const n of S.nations.values()){
+    if (!n.pop || n.pop<SC(80) || !has(n,'viaje_interestelar') || !chance(0.0015*(1+n.proc*0.1))) continue;
+    S.starships.push({nation:n.id, name:wordFrom(n.culture[1],2), arrive:S.year+40+Math.floor(rng()*70), start:S.year});
+  }
+  for (const sh of S.starships) if (!sh.done && S.year>=sh.arrive){
+    sh.done = true; const n = nat(sh.nation);
+    S.colonies = (S.colonies||0)+1;
+    const star = (n ? wordFrom(n.culture[1],2) : 'Nova') + ' ' + pick(['Alfa','Beta','Gamma','Prima','Mayor','Menor']);
+    const years = sh.arrive - (sh.start || (n && n.disc.viaje_interestelar) || sh.arrive-80);
+    if (S.colonies===1) log(`<span class="ico">✨</span>Después de ${years} años de viaje, la nave «${sh.name}»${n?' de '+NM(n):''} llega a la estrella ${star} y funda la primera colonia fuera del sistema solar.`, 'sociedad', n?[n.id]:[], true);
+    else {
+      const big = [5,10,25,50,100,250,500,1000].includes(S.colonies);
+      log(`<span class="ico">✨</span>La nave «${sh.name}»${n?' de '+NM(n):''} llega a la estrella ${star} y funda una colonia: ya hay ${S.colonies} mundos habitados fuera del sistema solar.`, 'sociedad', n?[n.id]:[], big);
+    }
+    if (S.colonies>=12 && once('vida')) log(`<span class="ico">🦠</span>En un planeta de la estrella ${star}, los colonos encuentran vida: diminutos seres que nunca tuvieron nada que ver con la Tierra. La humanidad ya no está sola en el universo.`, 'sociedad', n?[n.id]:[], true);
+  }
+  if (S.starships.length>200) S.starships = S.starships.filter(sh=>!sh.done);
+}
+
 // =====================================================================
 // Organización política por nación
 // =====================================================================
-const ORG_RANK = {'Banda nómade':0,'Tribu':1,'Jefatura':2,'Ciudad-estado':3,'Reino':4,'Imperio':5,'Civilización':6,'Estado industrial':7,'Potencia mundial':8,'Civilización espacial':9};
-function orgRank(o){ return o.startsWith('Civilización planetaria') ? 10 : (ORG_RANK[o] ?? 0); }
+const ORG_RANK = {'Banda nómade':0,'Tribu':1,'Jefatura':2,'Ciudad-estado':3,'Reino':4,'Imperio':5,'Civilización':6,'Estado industrial':7,'Potencia mundial':8,'Civilización espacial':9,'Civilización orbital':10,'Civilización interplanetaria':11,'Civilización interestelar':12};
+function orgRank(o){ return ORG_RANK[o.replace(/ \(era.*$/, '')] ?? 0; }
 function orgLevel(n){
   const d=n.disc, N=U(n.pop), B=n.bandsArr.length, vass=vassalsOf(n).length;
   let maxBand=0; for (const b of n.bandsArr) if (U(b.N)>maxBand) maxBand=U(b.N);
-  if (n.proc>0) return 'Civilización planetaria (era '+(Math.floor(n.proc/5)+1)+')';
+  if (d.viaje_interestelar) return n.proc>0 ? 'Civilización interestelar (era '+(Math.floor(n.proc/5)+1)+')' : 'Civilización interestelar';
+  if (d.colonia_marte) return 'Civilización interplanetaria';
+  if (d.base_lunar && N>250) return 'Civilización orbital';
   if (d.satelites && N>250) return 'Civilización espacial';
   if (d.aviacion && (N>450 || vass>=3) && B>=6) return 'Potencia mundial';
   if (d.maquina_vapor && N>200) return 'Estado industrial';
@@ -2468,10 +2766,10 @@ function orgStep(){
     if (!n.pop) continue;
     const o = orgLevel(n);
     if (o!==n.org){
-      if (S.year-n.founded<=1 || (o.startsWith('Civilización planetaria') && n.org.startsWith('Civilización planetaria'))){ n.org=o; continue; }
+      if (S.year-n.founded<=1 || (o.startsWith('Civilización interestelar') && n.org.startsWith('Civilización interestelar'))){ n.org=o; continue; }
       const up = orgRank(o) > orgRank(n.org);
-      const ORG_FIRST = {'Jefatura':'la primera jefatura','Ciudad-estado':'la primera ciudad-estado','Reino':'el primer reino','Imperio':'el primer imperio','Civilización':'la primera gran civilización','Estado industrial':'el primer estado industrial','Potencia mundial':'la primera potencia mundial','Civilización espacial':'la primera civilización espacial','Civilización planetaria':'la primera civilización planetaria'};
-      const oKey = o.startsWith('Civilización planetaria') ? 'Civilización planetaria' : o;
+      const ORG_FIRST = {'Jefatura':'la primera jefatura','Ciudad-estado':'la primera ciudad-estado','Reino':'el primer reino','Imperio':'el primer imperio','Civilización':'la primera gran civilización','Estado industrial':'el primer estado industrial','Potencia mundial':'la primera potencia mundial','Civilización espacial':'la primera civilización espacial','Civilización orbital':'la primera civilización orbital','Civilización interplanetaria':'la primera civilización interplanetaria','Civilización interestelar':'la primera civilización interestelar'};
+      const oKey = o.replace(/ \(era.*$/, '');
       if (up && ORG_FIRST[oKey] && once('org_'+oKey)){ const cb=S.bands.get(n.capital);
         log(`<span class="ico">🏛️</span>Nace ${ORG_FIRST[oKey]} de la historia: ${NM(n)}${cb?', con capital en '+cb.place+(WORLD.earth?' ('+whereName(Math.round(cb.x),Math.round(cb.y))+')':''):''}${n.leader?', bajo '+leaderLabel(n):''}.`, 'politica', [n.id], true); }
       else if (up && orgRank(o)>=2 && n.pop>=SC(20)) log(`<span class="ico">🏛️</span>${NM(n,true)} pasan de ser ${n.org.toLowerCase()} a convertirse en ${o.toLowerCase()}${n.leader?', bajo '+leaderLabel(n):''}.`, 'politica', [n.id]);
@@ -2488,6 +2786,7 @@ function tick(){
   if (S.ended) return;
   S.year++;
   disasterStep();
+  crisisStep();
   if (S.year%2===0 || S.bands.size<60 || !S.contacts.size) territoryStep();
   else for (const [k,ct] of S.contacts){ if (!nat(ct.a) || !nat(ct.b)) S.contacts.delete(k); }
   foodStep();
@@ -2509,9 +2808,12 @@ function tick(){
   relationStep();
   declarationStep();
   warStep();
+  nuclearStep();
   compact();
   civilWarStep();
   cultureStep();
+  sportsStep();
+  spaceStep();
   asabiyaStep();
   // naciones que se quedaron sin gente
   for (const n of [...S.nations.values()]){
@@ -2943,7 +3245,7 @@ function updateDrawSky(ctx, now, dt, cssZ){
   }
   // cohetes que despegan de las capitales
   const rk = modernNations('coheteria');
-  if (rk.length && now-lastRocket > 14000 && !reduceMotion){ lastRocket = now; const n = pick(rk), b = S.bands.get(n.capital); rockets.push({x:b.x+0.8*SF, y:b.y-0.4*SF, t0:now, color:n.color, sat: has(n,'satelites')}); }
+  if (rk.length && now-lastRocket > (modernNations('base_lunar').length ? 5000 : 14000) && !reduceMotion){ lastRocket = now; const n = pick(rk), b = S.bands.get(n.capital); rockets.push({x:b.x+0.8*SF, y:b.y-0.4*SF, t0:now, color:n.color, sat: has(n,'satelites')}); }
   rockets = rockets.filter(r=>now-r.t0<4200);
   for (const r of rockets){
     const t = (now-r.t0)/1000, h = 0.4*t*t*1.6*(detailed?0.5:1);   // acelera
@@ -2999,6 +3301,11 @@ function buildingList(b, n){
   if (has(n,'computacion') && U(b.N)>=120){ L.push('rascacielos'); if (U(b.N)>=250) L.push('rascacielos'); }
   if (has(n,'aviacion') && isCap) L.push('aeropuerto');
   if (has(n,'coheteria') && isCap) L.push('lanzadera');
+  if (has(n,'deporte_masivo') && (isCap || U(b.N)>=180)) L.push('estadio');
+  if (has(n,'fusion') && isCap) L.push('fusion'); else if (has(n,'energia_nuclear') && (isCap || U(b.N)>=160) && !has(n,'fusion')) L.push('central_nuclear');
+  if (has(n,'energias_limpias') && U(b.N)>=90) L.push('eolico');
+  if (has(n,'inteligencia_artificial') && (isCap || U(b.N)>=220)) L.push('datacenter');
+  if (has(n,'ascensor_espacial') && isCap) L.push('ascensor');
   return L;
 }
 function slotPos(b, k){
@@ -3129,6 +3436,49 @@ function drawBuilding(ctx, kind, x, y, n, now, seed){
       smokePuffs(ctx, x+s*0.55, y-s*1.25, now, seed, 1.2, true, 0.55);
       smokePuffs(ctx, x+s*0.19, y-s*1.05, now, seed+0.4, 1.0, true, 0.5);
       ctx.fillStyle='rgba(255,210,120,0.8)'; for (let i=0;i<4;i++) ctx.fillRect(x-s*0.65+i*s*0.35, y, s*0.14, s*0.14);
+      break; }
+    case 'estadio': {
+      ctx.fillStyle='#b4b6bc'; ctx.beginPath(); ctx.ellipse(x, y, s*1.15, s*0.62, 0, 0, TAU); ctx.fill();
+      ctx.strokeStyle=n.color; ctx.lineWidth=0.7; ctx.setLineDash([0.8,0.6]); ctx.beginPath(); ctx.ellipse(x, y, s*0.98, s*0.5, 0, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle='#4f9e48'; ctx.beginPath(); ctx.ellipse(x, y, s*0.72, s*0.34, 0, 0, TAU); ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,0.85)'; ctx.lineWidth=0.25; ctx.beginPath(); ctx.moveTo(x, y-s*0.34); ctx.lineTo(x, y+s*0.34); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x, y, s*0.12, 0, TAU); ctx.stroke();
+      ctx.fillStyle='#5a5e66'; for (const [dx,dy] of [[-1,-1],[1,-1],[-1,1],[1,1]]) ctx.fillRect(x+dx*s*1.0-0.3, y+dy*s*0.45-s*0.5, 0.6, s*0.5);
+      if (reduceMotion || Math.floor(now/900+seed*5)%3){ ctx.fillStyle='rgba(255,250,220,0.95)'; for (const [dx,dy] of [[-1,-1],[1,-1],[-1,1],[1,1]]) ctx.fillRect(x+dx*s*1.0-0.6, y+dy*s*0.45-s*0.55, 1.2, 0.5); }
+      break; }
+    case 'central_nuclear': {
+      ctx.fillStyle='#cfcfca'; ctx.beginPath(); ctx.moveTo(x-s*0.55, y+s*0.4); ctx.quadraticCurveTo(x-s*0.22, y-s*0.3, x-s*0.38, y-s*0.95);
+      ctx.lineTo(x+s*0.38, y-s*0.95); ctx.quadraticCurveTo(x+s*0.22, y-s*0.3, x+s*0.55, y+s*0.4); ctx.closePath(); ctx.fill();
+      ctx.fillStyle='#a8a8a2'; ctx.fillRect(x-s*0.45, y-s*0.1, s*0.9, s*0.12);
+      ctx.fillStyle='#dcdcd6'; ctx.beginPath(); ctx.arc(x+s*0.85, y+s*0.4, s*0.32, Math.PI, 0); ctx.fill();
+      smokePuffs(ctx, x, y-s*1.0, now, seed, 1.6, false, 0.7);
+      break; }
+    case 'fusion': {
+      ctx.fillStyle='#3a4250'; ctx.fillRect(x-s*0.8, y-s*0.2, s*1.6, s*0.6);
+      const pl = reduceMotion ? 0.7 : 0.55+0.45*Math.sin(now/300+seed*9);
+      const gr = ctx.createRadialGradient(x, y-s*0.45, 0, x, y-s*0.45, s*1.2); gr.addColorStop(0, `rgba(255,220,120,${0.7*pl})`); gr.addColorStop(1, 'rgba(255,220,120,0)');
+      ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(x, y-s*0.45, s*1.2, 0, TAU); ctx.fill();
+      ctx.strokeStyle='#ffd36a'; ctx.lineWidth=0.9; ctx.beginPath(); ctx.ellipse(x, y-s*0.45, s*0.6, s*0.22, 0, 0, TAU); ctx.stroke();
+      ctx.fillStyle='#fff6d8'; ctx.beginPath(); ctx.arc(x, y-s*0.45, s*0.14, 0, TAU); ctx.fill();
+      break; }
+    case 'eolico': {
+      for (let i=0;i<2;i++){ const px=x+(i?s*0.5:-s*0.4), top=y-s*(1.3+i*0.2);
+        ctx.strokeStyle='#e8e8ec'; ctx.lineWidth=0.4; ctx.beginPath(); ctx.moveTo(px, y+s*0.4); ctx.lineTo(px, top); ctx.stroke();
+        const a0 = reduceMotion ? 0 : now/500 + seed*6 + i;
+        ctx.lineWidth=0.35; ctx.beginPath(); for (let k=0;k<3;k++){ const a=a0+k*TAU/3; ctx.moveTo(px,top); ctx.lineTo(px+Math.cos(a)*s*0.5, top+Math.sin(a)*s*0.5); } ctx.stroke(); }
+      ctx.fillStyle='#2e3e66'; ctx.fillRect(x-s*0.9, y+s*0.15, s*0.6, s*0.25); ctx.fillStyle='#4a62a0'; ctx.fillRect(x-s*0.86, y+s*0.18, s*0.52, s*0.08);
+      break; }
+    case 'datacenter': {
+      ctx.fillStyle='#262e3a'; ctx.fillRect(x-s*0.75, y-s*0.45, s*1.5, s*0.85);
+      ctx.fillStyle='#3a4454'; ctx.fillRect(x-s*0.75, y-s*0.55, s*1.5, s*0.12);
+      for (let r=0;r<3;r++) for (let c=0;c<6;c++){ const on = reduceMotion || hashCell(r*13+c, (Math.floor(now/350)+seed*100)|0) > 0.4;
+        ctx.fillStyle = on ? 'rgba(90,230,255,0.95)' : 'rgba(60,110,140,0.6)'; ctx.fillRect(x-s*0.6+c*s*0.22, y-s*0.3+r*s*0.22, s*0.1, s*0.08); }
+      break; }
+    case 'ascensor': {
+      ctx.fillStyle='#8a8e98'; ctx.fillRect(x-s*0.5, y+s*0.1, s*1.0, s*0.3);
+      ctx.strokeStyle='rgba(225,235,255,0.75)'; ctx.lineWidth=0.5; ctx.beginPath(); ctx.moveTo(x, y+s*0.1); ctx.lineTo(x, y-s*40); ctx.stroke();
+      for (let k=0;k<2;k++){ const f = reduceMotion ? 0.3+k*0.4 : ((now/5000 + seed + k*0.5) % 1), cy2 = y - f*s*40;
+        ctx.fillStyle='#f0f2f6'; ctx.fillRect(x-s*0.14, cy2-s*0.2, s*0.28, s*0.3); }
       break; }
   }
 }
@@ -3453,6 +3803,27 @@ function startBattle(ev, now){
   }
   battles.push(bt);
 }
+// explosión nuclear: destello, onda expansiva y hongo; se ve tanto de lejos como de cerca
+let nukes = [];
+function startNuke(ev, now){ nukes.push({x:ev.x, y:ev.y, t0:now}); if (nukes.length>6) nukes.shift(); }
+function drawNukes(ctx, now, cssZ){
+  if (!nukes.length) return;
+  nukes = nukes.filter(k=>now-k.t0<7000);
+  for (const k of nukes){
+    const t = (now-k.t0)/1000, X=k.x*CELL_PX, Y=k.y*CELL_PX, Rr = Math.max(CELL_PX*1.1, 26/cssZ);
+    if (!LOD.inView(X,Y)) continue;
+    if (t<0.5){ ctx.fillStyle=`rgba(255,255,240,${1-t/0.5})`; ctx.beginPath(); ctx.arc(X,Y,Rr*(0.3+t*3),0,TAU); ctx.fill(); }
+    if (t<2.5){ ctx.strokeStyle=`rgba(255,240,220,${0.8*(1-t/2.5)})`; ctx.lineWidth=Math.max(1, 2/cssZ); ctx.beginPath(); ctx.arc(X,Y,Rr*(0.4+t*1.4),0,TAU); ctx.stroke(); }
+    const g = Math.min(1, t/1.6), a = t<3.5 ? 1 : Math.max(0, 1-(t-3.5)/3.5), h = Rr*1.7*g;
+    ctx.globalAlpha = a;
+    ctx.fillStyle='rgba(110,86,70,0.9)'; ctx.fillRect(X-Rr*0.12, Y-h, Rr*0.24, h);
+    const cr = Rr*0.5*(0.5+g*0.5), gr = ctx.createRadialGradient(X, Y-h, cr*0.1, X, Y-h, cr);
+    gr.addColorStop(0, t<2 ? 'rgba(255,190,90,1)' : 'rgba(170,140,120,1)'); gr.addColorStop(0.6, 'rgba(150,110,90,0.95)'); gr.addColorStop(1, 'rgba(90,80,76,0.85)');
+    ctx.fillStyle=gr; ctx.beginPath(); ctx.ellipse(X, Y-h, cr*1.3, cr*0.8, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle='rgba(120,100,90,0.7)'; ctx.beginPath(); ctx.ellipse(X, Y-h*0.45, cr*0.7, cr*0.25, 0, 0, TAU); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+}
 function startFire(ev, now){
   if (fires.length>10) return;
   fires.push({x:ev.x, y:ev.y, t0:now, t1:now+3800, n:Math.min(6, 2+Math.ceil(U(ev.big||SC(10))/25)), seed:Math.random()});
@@ -3700,6 +4071,7 @@ function drawMap(now){
     if (detailed) drawVehicles(ctx, now);
     updateDrawSky(ctx, now, frameDt, cssZ);
     // batallas, incendios y partículas
+    drawNukes(ctx, now, cssZ);
     if (detailed){ updateDrawBattles(ctx, frameDt, now); updateDrawFx(ctx, now); if (cssZ>=1.8) drawFigureMarkers(ctx, cssZ); else LOD.markers=[]; }
     else { drawBattleIcons(ctx, now, cssZ); if (fx.length) fx = []; LOD.markers = []; }
   }
@@ -3813,7 +4185,7 @@ function updateDetail(){
   const gb=$('goNation'); if (gb) gb.onclick=()=>{ const b=S.bands.get(n.capital); if (b){ camera.x=b.x*CELL_PX; camera.y=b.y*CELL_PX; camera.zoom=clampZoom(Math.max(camera.zoom, fitZoom()*2.2, dprNow()*1.6)); } };
 }
 // ---------- personajes ----------
-const ROLE_LABEL = {'líder':'👑 Líder','heredero':'Heredero','genio':'💡 Genio','inventor':'⚙️ Inventor','fundador':'🏳️ Fundador','rebelde':'🔥 Rebelde','profeta':'✨ Profeta','general':'⚔️ General'};
+const ROLE_LABEL = {'deportista':'🏅 Deportista','líder':'👑 Líder','heredero':'Heredero','genio':'💡 Genio','inventor':'⚙️ Inventor','fundador':'🏳️ Fundador','rebelde':'🔥 Rebelde','profeta':'✨ Profeta','general':'⚔️ General'};
 const ROLE_W = {'líder':3,'heredero':0.3,'genio':3,'inventor':6,'fundador':3,'rebelde':2.5,'profeta':2,'general':2};
 function figScore(f){ let s=0; for (const r of f.roles) s += ROLE_W[r]||1; const nn=nationById(f.nation); if (f.roles.includes('líder') && nn) s += Math.min(4, U(nn.peak||0)/300); return s + f.events.length*0.25; }
 function figNation(f){ return nationById(f.nation); }
@@ -4117,8 +4489,12 @@ $('hudPlay').addEventListener('click', ()=> $('playBtn').click());
 function worldEra(){
   if (!S) return 'Antes del tiempo';
   const f = S.firsts;
-  if ([...S.nations.values()].some(n=>n.proc>0)) return 'Era planetaria';
+  if (f.viaje_interestelar) return 'Era interestelar';
+  if (f.colonia_marte) return 'Era interplanetaria';
+  if (f.ia_general) return 'Era de las máquinas pensantes';
+  if (f.inteligencia_artificial) return 'Era de la inteligencia artificial';
   if (f.satelites || f.coheteria) return 'Era espacial';
+  if (f.armas_nucleares || f.fisica_nuclear) return 'Era atómica';
   if (f.computacion || f.internet) return 'Era de la información';
   if (f.motor_combustion || f.aviacion) return 'Era del motor';
   if (f.electricidad) return 'Era eléctrica';
@@ -4190,7 +4566,7 @@ window.addEventListener('resize', ()=>{ drawCharts(); });
 
 function drainEvents(){
   if (!S) return; const now=performance.now();
-  for (const ev of S.battleEvents){ if (ev.type==='burn') startFire(ev, now); else if (ev.a!=null) startBattle(ev, now); }
+  for (const ev of S.battleEvents){ if (ev.type==='burn') startFire(ev, now); else if (ev.type==='nuke'){ startNuke(ev, now); startFire(ev, now); } else if (ev.a!=null) startBattle(ev, now); }
   S.battleEvents.length=0;
 }
 
