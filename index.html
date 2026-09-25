@@ -6,85 +6,188 @@
 <title>Crónica de una civilización</title>
 <style>
   :root{
-    --bg:#1b1712; --surface:#241f19; --surface-2:#2e2820;
-    --ink:#e9ddc4; --ink-dim:#b3a686;
-    --ochre:#b9722c; --ochre-bright:#e0994c;
-    --moss:#7c9a5a; --blood:#c0584d; --sky:#6a9aab;
-    --border:#3d3527;
+    --bg:#e4ebef; --surface:#fbfcfd; --surface-2:#edf2f5; --sunk:#dfe7ec;
+    --ink:#1c2935; --ink-dim:#566775; --border:#d0dbe2;
+    --ochre:#b06a08; --ochre-bright:#a45f00;
+    --moss:#3f7a3a; --blood:#b3372c; --sky:#2f6582;
+    --go:#2f8f46; --go-hi:#27793b; --go-ink:#ffffff;
+    --chrome:#1e3a55; --chrome-2:#284a6b; --chrome-ink:#eef4f8; --chrome-dim:#a9bfd1; --gold:#f4b63f;
     --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
-    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --round: ui-rounded, 'SF Pro Rounded', 'Nunito', 'Varela Round', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --sans: var(--round);
     --mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
-    --map-h: 480px;
+    --map-h: clamp(380px, 60vh, 700px);
+    --r-lg:16px; --r-md:10px; --r-sm:7px;
+    --lift: 0 1px 0 rgba(20,40,60,.04), 0 6px 18px -10px rgba(20,40,60,.25);
     box-sizing:border-box;
     padding-top:env(safe-area-inset-top,0px);
     padding-bottom:env(safe-area-inset-bottom,0px);
   }
-  @media (prefers-color-scheme: light){
-    :root:not([data-theme="dark"]){
-      --bg:#ece3cf; --surface:#f5efdf; --surface-2:#e7dcbe;
-      --ink:#2a2115; --ink-dim:#6b5f47;
-      --ochre:#a5601f; --ochre-bright:#8a4f18;
-      --moss:#4c6b34; --blood:#8a3530; --sky:#2f5c6e;
-      --border:#cdba90;
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0d1823; --surface:#142331; --surface-2:#1b2e40; --sunk:#10202e;
+      --ink:#e3ebf1; --ink-dim:#93a7b8; --border:#253c52;
+      --ochre:#e0a13c; --ochre-bright:#f2b652;
+      --moss:#79b36a; --blood:#e0685c; --sky:#7fb2cc;
+      --go:#43ad5c; --go-hi:#52bd6a; --go-ink:#0b1a10;
+      --chrome:#0a1520; --chrome-2:#15283a; --chrome-ink:#e8f0f6; --chrome-dim:#8aa3b8;
+      --lift: 0 1px 0 rgba(0,0,0,.2), 0 8px 22px -12px rgba(0,0,0,.6);
     }
   }
-  :root[data-theme="light"]{
-    --bg:#ece3cf; --surface:#f5efdf; --surface-2:#e7dcbe;
-    --ink:#2a2115; --ink-dim:#6b5f47;
-    --ochre:#a5601f; --ochre-bright:#8a4f18;
-    --moss:#4c6b34; --blood:#8a3530; --sky:#2f5c6e;
-    --border:#cdba90;
-  }
   :root[data-theme="dark"]{
-    --bg:#1b1712; --surface:#241f19; --surface-2:#2e2820;
-    --ink:#e9ddc4; --ink-dim:#b3a686;
-    --ochre:#b9722c; --ochre-bright:#e0994c;
-    --moss:#7c9a5a; --blood:#c0584d; --sky:#6a9aab;
-    --border:#3d3527;
+    --bg:#0d1823; --surface:#142331; --surface-2:#1b2e40; --sunk:#10202e;
+    --ink:#e3ebf1; --ink-dim:#93a7b8; --border:#253c52;
+    --ochre:#e0a13c; --ochre-bright:#f2b652;
+    --moss:#79b36a; --blood:#e0685c; --sky:#7fb2cc;
+    --go:#43ad5c; --go-hi:#52bd6a; --go-ink:#0b1a10;
+    --chrome:#0a1520; --chrome-2:#15283a; --chrome-ink:#e8f0f6; --chrome-dim:#8aa3b8;
+    --lift: 0 1px 0 rgba(0,0,0,.2), 0 8px 22px -12px rgba(0,0,0,.6);
   }
   *{box-sizing:border-box;}
-  html{scroll-padding-top:env(safe-area-inset-top,0px);}
-  body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.4;}
-  .wrap{max-width:1280px; margin:0 auto; padding:28px 20px 60px;}
-  header{margin-bottom:14px;}
-  h1{font-family:var(--serif); font-weight:600; font-size:clamp(28px,4vw,40px); margin:0 0 4px; letter-spacing:.2px;}
-  .subtitle{color:var(--ink-dim); font-size:14px; max-width:68ch;}
+  html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 80px);}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--round); line-height:1.45; -webkit-font-smoothing:antialiased;}
+  [hidden]{display:none !important;}
+  h1,h2,h3{font-family:var(--round);}
 
-  .status-bar{display:flex; flex-wrap:wrap; gap:10px 24px; align-items:baseline; margin:16px 0 6px; font-family:var(--mono); font-size:14px;}
-  .status-bar b{color:var(--ochre-bright); font-size:16px;}
-  .hitos{display:flex; gap:6px; flex-wrap:wrap; margin:10px 0 4px;}
-  .hito{font-size:12px; padding:4px 9px; border-radius:3px; border:1px solid var(--border); color:var(--ink); background:var(--surface); display:inline-flex; gap:6px; align-items:center;}
-  .hito i{width:8px; height:8px; border-radius:50%; display:inline-block; background:var(--c);}
-  .hito small{color:var(--ink-dim);}
+  /* barra superior: título, reloj y controles de juego */
+  .topbar{position:sticky; top:0; z-index:50; display:flex; align-items:center; gap:14px 22px; flex-wrap:wrap;
+    padding:10px max(18px, env(safe-area-inset-right,0px)) 10px max(18px, env(safe-area-inset-left,0px));
+    background:var(--chrome); color:var(--chrome-ink); box-shadow:0 2px 12px rgba(0,0,0,.18);}
+  .brand{display:flex; align-items:center; gap:10px; margin-right:auto; min-width:0;}
+  .logo{font-size:26px; line-height:1;}
+  .topbar h1{font-size:19px; font-weight:800; margin:0; letter-spacing:-.01em; line-height:1.15;}
+  .tagline{margin:0; font-size:12.5px; color:var(--chrome-dim);}
+  .clock{display:flex; flex-direction:column; align-items:flex-end; line-height:1.1; min-width:112px;}
+  .clock .era{font-size:12px; color:var(--gold); font-weight:700;}
+  .clock .year{font-size:15px; color:var(--chrome-dim);} .clock .year b{font-size:21px; color:var(--chrome-ink); font-variant-numeric:tabular-nums; font-weight:800;}
+  .transport{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .topbar button{font-family:var(--round);}
+  .play{background:var(--go); color:#fff; border:0; border-radius:999px; padding:10px 22px; font-size:15.5px; font-weight:800; min-width:132px; box-shadow:0 2px 0 rgba(0,0,0,.25);}
+  .play:hover{background:var(--go-hi);}
+  .ghost{background:transparent; color:var(--chrome-ink); border:1px solid rgba(255,255,255,.22); border-radius:999px; padding:8px 14px; font-size:13.5px; font-weight:700;}
+  .ghost:hover{background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.4);}
+  .speed{display:flex; background:rgba(0,0,0,.22); border-radius:999px; padding:3px; gap:2px;}
+  .speed button{border:0; background:transparent; color:var(--chrome-dim); border-radius:999px; padding:6px 9px; font-size:12.5px; font-weight:700; font-variant-numeric:tabular-nums; min-width:34px;}
+  .speed button:hover{color:var(--chrome-ink);}
+  .speed button.on{background:var(--chrome-ink); color:var(--chrome);}
+  .speed .unit{align-self:center; font-size:11.5px; color:var(--chrome-dim); padding:0 8px 0 4px;}
 
-  .grid{display:grid; grid-template-columns:290px minmax(0,1fr); gap:18px; margin-top:18px; align-items:start;}
-  @media (max-width:880px){ .grid{grid-template-columns:1fr;} :root{--map-h:360px;} }
-  .col{display:flex; flex-direction:column; gap:16px; min-width:0;}
-  .two{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px;}
+  /* dos columnas: el armado (o la crónica) y el escenario */
+  .layout{display:grid; grid-template-columns:minmax(300px,360px) minmax(0,1fr); gap:20px; max-width:1500px; margin:0 auto; padding:20px max(18px, env(safe-area-inset-right,0px)) 60px max(18px, env(safe-area-inset-left,0px)); align-items:start;}
+  .side{position:sticky; top:84px; max-height:calc(100vh - 104px); display:flex; flex-direction:column; min-height:0;}
+  .stage{display:flex; flex-direction:column; gap:16px; min-width:0;}
+  @media (max-width:980px){
+    .layout{grid-template-columns:1fr;}
+    .side{position:static; max-height:none; order:2;}
+    .stage{order:1;}
+    .tagline{display:none;}
+  }
+  @media (max-width:640px){
+    .brand{width:100%;} .clock{align-items:flex-start;} .transport{width:100%;}
+    .speed{overflow-x:auto; max-width:100%;}
+    :root{--map-h:340px;}
+  }
+
+  /* armado de la partida */
+  .setup, .live{background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); box-shadow:var(--lift);}
+  .setup{padding:18px 18px 16px; overflow-y:auto; overscroll-behavior:contain;}
+  .live{display:none;}
+  body.playing .setup{display:none;}
+  body.playing .live{display:flex; flex-direction:column; min-height:0; flex:1; overflow:hidden;}
+  .step{display:flex; align-items:center; gap:10px; font-size:17px; font-weight:800; margin:4px 0 12px;}
+  .step + .help{margin-top:-6px;}
+  .step small{font-size:12px; font-weight:600; color:var(--ink-dim); margin-left:auto;}
+  .step .num{display:inline-grid; place-items:center; width:26px; height:26px; border-radius:50%; background:var(--chrome); color:var(--chrome-ink); font-size:14px; flex:none;}
+  .step:not(:first-child){margin-top:22px; padding-top:18px; border-top:1px dashed var(--border);}
+  .worlds{display:flex; flex-direction:column; gap:8px;}
+  .world{display:grid; grid-template-columns:40px 1fr; grid-template-rows:auto auto; column-gap:10px; text-align:left; padding:11px 12px; border-radius:var(--r-md);
+    background:var(--surface-2); border:2px solid transparent; color:var(--ink); cursor:pointer; font-family:var(--round); transition:border-color .15s, background .15s;}
+  .world:hover{border-color:var(--border);}
+  .world.on{border-color:var(--go); background:color-mix(in srgb, var(--go) 9%, var(--surface));}
+  .w-ico{grid-row:span 2; font-size:26px; line-height:40px; text-align:center; background:var(--surface); border-radius:10px; height:40px;}
+  .w-t{font-weight:800; font-size:15px;}
+  .w-d{font-size:12.5px; color:var(--ink-dim); font-weight:500; line-height:1.4;}
+  .world-opts{margin-top:14px; display:flex; flex-direction:column; gap:14px;}
+  .field{margin:0;}
+  .lbl{display:flex; align-items:baseline; gap:8px; font-size:13px; font-weight:700; margin-bottom:6px; color:var(--ink);}
+  .lbl small{font-weight:500; color:var(--ink-dim);}
+  .chips{display:flex; flex-wrap:wrap; gap:6px;}
+  .chips button{border:1px solid var(--border); background:var(--surface); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:13px; font-weight:600; font-family:var(--round);}
+  .chips button:hover{border-color:var(--ink-dim);}
+  .chips button.on{background:var(--chrome); color:var(--chrome-ink); border-color:var(--chrome);}
+  .seed-row{display:flex; gap:6px;} .seed-row input{flex:1; min-width:0;}
+  .seed-row button{white-space:nowrap;}
+  input[type=text]{width:100%; background:var(--surface); border:1px solid var(--border); color:var(--ink); padding:8px 10px; border-radius:var(--r-sm); font-family:var(--mono); font-size:13.5px;}
+  .help{font-size:12.5px; color:var(--ink-dim); margin:6px 0 0; line-height:1.5;}
+  .help.center{text-align:center;}
+  small.help{display:block;}
+
+  /* grupos de ajustes */
+  .sgroup{border:1px solid var(--border); border-radius:var(--r-md); margin-top:8px; background:var(--surface);}
+  .sgroup summary{list-style:none; cursor:pointer; padding:11px 12px; display:flex; align-items:center; gap:10px; font-weight:800; font-size:14px; border-radius:var(--r-md);}
+  .sgroup summary::-webkit-details-marker{display:none;}
+  .sgroup summary .gi{font-size:18px;}
+  .sgroup summary .gt{display:flex; flex-direction:column; line-height:1.25; margin-right:auto;}
+  .sgroup summary .gd{font-weight:500; font-size:12px; color:var(--ink-dim);}
+  body:not(.playing) .stats{display:none;}
+  .sgroup summary::after{content:'▾'; color:var(--ink-dim); font-size:12px; transition:transform .15s; margin-left:6px;}
+  .sgroup[open] summary::after{transform:rotate(180deg);}
+  .sgroup[open] summary{border-bottom:1px solid var(--border); border-radius:var(--r-md) var(--r-md) 0 0;}
+  .sgroup .sbody{padding:10px 12px 4px;}
+  .slider{margin-bottom:12px;}
+  .slider .top{display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:13px; font-weight:700;}
+  .slider .val{font-variant-numeric:tabular-nums; font-weight:800; color:var(--ochre-bright); min-width:3ch; text-align:right;}
+  .slider .hint{font-size:11.5px; color:var(--ink-dim); font-weight:500; margin:1px 0 2px;}
+  .slider .ends{display:flex; justify-content:space-between; font-size:11px; color:var(--ink-dim); margin-top:-2px;}
+  input[type=range]{width:100%; accent-color:var(--go); margin:4px 0 2px;}
+  .linkish{background:none; border:0; padding:6px 0; color:var(--sky); font-size:12.5px; font-weight:700; text-decoration:underline; text-underline-offset:3px; cursor:pointer; font-family:var(--round);}
+  .start{display:block; width:100%; margin-top:18px; background:var(--go); color:#fff; border:0; border-radius:999px; padding:14px; font-size:17px; font-weight:800; font-family:var(--round); cursor:pointer; box-shadow:0 3px 0 color-mix(in srgb, var(--go) 60%, #000);}
+  .start:hover{background:var(--go-hi);}
+
+  /* la partida en curso: promedio y crónica */
+  .means{padding:14px 16px 12px; border-bottom:1px solid var(--border);}
+  .means h2, .chron-head h2, .firsts h2{font-size:14.5px; font-weight:800; margin:0 0 8px;}
+  .stat-summary{display:grid; grid-template-columns:1fr 1fr; gap:6px 14px; font-size:12.5px; color:var(--ink-dim);}
+  .stat-summary div b{display:block; font-size:17px; color:var(--ink); font-variant-numeric:tabular-nums; font-weight:800;}
+  .chronicle{display:flex; flex-direction:column; min-height:0; flex:1; padding:12px 16px 8px;}
+  .chron-head{display:flex; align-items:baseline; justify-content:space-between; gap:8px; flex-wrap:wrap;}
+  .chron-head label{font-size:12px; color:var(--ink-dim); display:inline-flex; gap:5px; align-items:center;}
+  .filters{margin:2px 0 8px;}
+  #log{overflow-y:auto; flex:1; min-height:220px; padding-right:4px;}
+  @media (max-width:980px){ #log{max-height:480px;} }
+
+  /* números de la partida */
+  .stats{display:flex; flex-wrap:wrap; gap:8px;}
+  .stat{background:var(--surface); border:1px solid var(--border); border-radius:var(--r-md); padding:8px 14px; display:flex; flex-direction:column; min-width:108px;}
+  .stat span{font-size:12px; color:var(--ink-dim); font-weight:600;}
+  .stat b{font-size:19px; font-weight:800; font-variant-numeric:tabular-nums; line-height:1.2;}
+  .stat.grow{flex:1; min-width:200px;} .stat.grow b{font-size:16px;}
+
+  .mapcard{background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:10px; box-shadow:var(--lift);}
+  .mapcard .help{margin:6px 4px 2px;}
+  .map-modes{position:absolute; left:10px; top:10px; z-index:3;}
+  .firsts{padding:0 2px;}
+  .firsts h2{color:var(--ink-dim);}
+
+  /* pestañas de abajo */
+  .dock{background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); box-shadow:var(--lift); overflow:hidden;}
+  .tabs{display:flex; gap:4px; padding:8px 8px 0; background:var(--sunk); border-bottom:1px solid var(--border); overflow-x:auto;}
+  .tabs button{border:1px solid transparent; border-bottom:0; background:transparent; color:var(--ink-dim); padding:10px 16px; border-radius:var(--r-md) var(--r-md) 0 0; font-size:14px; font-weight:800; font-family:var(--round); cursor:pointer; white-space:nowrap; margin-bottom:-1px;}
+  .tabs button:hover{color:var(--ink);}
+  .tabs button[aria-selected="true"]{background:var(--surface); color:var(--ink); border-color:var(--border);}
+  .pane{padding:16px 18px 18px;}
+  .pane-top{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .pane-h{font-size:13px; font-weight:800; color:var(--ink-dim); margin:0 0 8px;}
+  .pane-top .pane-h{margin:0;}
+  .two{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px;}
   @media (max-width:1060px){ .two{grid-template-columns:1fr;} }
 
-  .panel{background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:16px 18px; min-width:0;}
-  .panel h2{font-family:var(--serif); font-size:16px; margin:0 0 12px; font-weight:600; padding-bottom:8px; border-bottom:1px solid var(--border);}
-  .panel-head{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid var(--border);}
-  .panel-head h2{margin:0; padding:0; border:0;}
-  .field{margin-bottom:12px;}
-  .field label{display:flex; justify-content:space-between; font-size:13px; color:var(--ink-dim); margin-bottom:4px;}
-  .field label span.val{font-family:var(--mono); color:var(--ink);}
-  input[type=range]{width:100%; accent-color:var(--ochre-bright);}
-  input[type=text]{width:100%; background:var(--surface-2); border:1px solid var(--border); color:var(--ink); padding:6px 8px; border-radius:3px; font-family:var(--mono); font-size:13px;}
-  .seed-row{display:flex; gap:6px;} .seed-row input{flex:1;}
-  button{font-family:var(--sans); font-size:13.5px; font-weight:600; cursor:pointer; border-radius:3px; border:1px solid var(--border); background:var(--surface-2); color:var(--ink); padding:8px 12px; transition:background .15s, border-color .15s;}
-  button:hover{border-color:var(--ochre-bright);}
-  button:focus-visible, select:focus-visible, input:focus-visible, .nrow:focus-visible{outline:2px solid var(--ochre-bright); outline-offset:2px;}
+  /* botones genéricos del cuerpo */
+  button{font-family:var(--round); font-size:13.5px; font-weight:700; cursor:pointer; border-radius:var(--r-sm); border:1px solid var(--border); background:var(--surface-2); color:var(--ink); padding:8px 12px; transition:background .15s, border-color .15s;}
+  button:hover{border-color:var(--ink-dim);}
+  button:focus-visible, select:focus-visible, input:focus-visible, .nrow:focus-visible, summary:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
   button:disabled{opacity:.4; cursor:not-allowed;}
-  button.primary{background:var(--ochre-bright); color:var(--bg); border-color:var(--ochre-bright);}
-  .controls-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;}
-  select{background:var(--surface-2); color:var(--ink); border:1px solid var(--border); border-radius:3px; padding:7px 9px; font-family:var(--sans); font-size:13.5px; width:100%;}
-  .controls-row select{width:auto;}
-  .note{font-size:12px; color:var(--ink-dim); margin-top:10px; line-height:1.5;}
-  .stat-summary{display:grid; grid-template-columns:1fr 1fr; gap:8px 14px; font-size:13px; margin-top:4px;}
-  .stat-summary div b{display:block; font-family:var(--mono); font-size:15px; color:var(--ink);}
-  h2.sub{margin-top:18px;}
+  select{background:var(--surface-2); color:var(--ink); border:1px solid var(--border); border-radius:var(--r-sm); padding:7px 9px; font-family:var(--round); font-size:13.5px;}
 
   .seg{display:inline-flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; flex-wrap:wrap;}
   .seg button{border:0; border-radius:0; padding:5px 10px; font-size:12.5px; font-weight:500; background:transparent; color:var(--ink-dim);}
@@ -183,11 +286,6 @@
 
   canvas.chart{width:100%; height:200px; display:block; border-radius:4px;}
 
-  .chronicle{background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:14px 16px;}
-  .chron-head{display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; justify-content:space-between; margin-bottom:8px;}
-  .chron-head h2{font-family:var(--serif); font-size:16px; margin:0; font-weight:600;}
-  .chron-head label{font-size:12.5px; color:var(--ink-dim); display:inline-flex; gap:6px; align-items:center;}
-  #log{max-height:460px; overflow-y:auto;}
   .entry{font-family:var(--serif); font-size:14.5px; line-height:1.6; padding:7px 0; border-bottom:1px solid var(--border);}
   .entry:last-child{border-bottom:none;}
   .entry .yr{color:var(--ochre-bright); font-weight:600; font-family:var(--mono); font-size:13px;}
@@ -199,150 +297,246 @@
   @media (prefers-color-scheme: light){ :root:not([data-theme="dark"]) .nat{filter:brightness(.7) saturate(1.2);} }
   :root[data-theme="light"] .nat{filter:brightness(.7) saturate(1.2);}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+
+  /* ajustes sobre los estilos del mapa y los paneles */
+  .seg{border-radius:999px; background:var(--surface-2);}
+  .seg button{padding:6px 12px; font-size:12.5px; font-weight:700;}
+  .seg button.on{background:var(--chrome); color:var(--chrome-ink);}
+  .filters{display:flex; flex-wrap:wrap; border:0; background:transparent; gap:4px;}
+  .filters button, .filters button + button{border:1px solid var(--border); border-radius:999px; padding:4px 10px; font-size:12px;}
+  .map-modes{background:rgba(12,24,36,.72); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); border-color:rgba(255,255,255,.18);}
+  .map-modes button{color:#dbe6ee;} .map-modes button + button{border-left-color:rgba(255,255,255,.14);}
+  .map-modes button.on{background:rgba(255,255,255,.92); color:#1e3a55;}
+  canvas#map{border-radius:var(--r-md);}
+  .map-tools .seg, .tool-opts, .map-zoom-controls button, .figcard, .map-placeholder{background:rgba(12,24,36,.78);}
+  .map-tools .seg{border-radius:12px;}
+  .map-tools .seg button.on{background:rgba(244,182,63,.4);}
+  .map-zoom-controls button{border-radius:10px; color:#eef4f8; width:36px; height:36px;}
+  .map-placeholder{top:auto; bottom:12px; left:12px; right:60px; max-width:none; width:fit-content; font-size:13.5px; padding:8px 12px; border-radius:10px; color:#eef4f8;}
+  .map-wrap.cine .map-modes{display:none;}
+  .map-wrap.fs .map-modes{top:max(64px, calc(env(safe-area-inset-top,0px) + 58px));}
+  .map-wrap.fs, .map-wrap:fullscreen{background:#0d1823;}
+  .hud-ctrl #hudPlay{background:var(--go); color:#fff; border-color:var(--go);}
+  .hud-year, .figcard .nm{font-family:var(--round); font-weight:800;}
+  .hitos{display:flex; gap:6px; flex-wrap:wrap; margin:0; max-height:112px; overflow-y:auto;}
+  .hito{font-size:12.5px; font-weight:700; padding:4px 11px 4px 9px; border-radius:999px; border:1px solid var(--border); color:var(--ink); background:var(--surface); display:inline-flex; gap:6px; align-items:center; white-space:nowrap;}
+  .hito i{width:8px; height:8px; border-radius:50%; display:inline-block; background:var(--c);}
+  .hito small{color:var(--ink-dim); font-weight:500;}
+  .filters{overflow:visible; border-radius:0;}
+  .hito{border-radius:999px; padding:4px 10px; background:var(--surface);}
+  .nrow{border-radius:var(--r-sm);}
+  .nrow.sel{border-color:var(--go);}
+  .bar i{background:var(--go);}
+  .detail .big{font-family:var(--round); font-weight:800;}
+  .entry{font-size:14px; line-height:1.55; padding:8px 0;}
+  .entry .yr{font-family:var(--round); font-weight:800; font-size:12.5px; color:var(--ochre-bright);}
+  .role, .tag{border-radius:999px;}
+  .legend{margin:8px 4px 0;}
+  body:not(.playing) .firsts, body:not(.playing) .dock{display:none;}
+  @media (max-width:640px){
+    .topbar{position:static;}
+    .map-modes{position:static; display:flex; flex-wrap:nowrap; overflow-x:auto; margin:0 0 8px; background:var(--surface-2); border-color:var(--border); backdrop-filter:none;}
+    .map-modes button{color:var(--ink-dim); white-space:nowrap;} .map-modes button + button{border-left-color:var(--border);}
+    .map-modes button.on{background:var(--chrome); color:var(--chrome-ink);}
+    .map-wrap.fs .map-modes{display:none;}
+    .map-wrap:not(.fs) .map-tools{top:54px;}
+  }
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important; scroll-behavior:auto !important;} }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>Crónica de una civilización</h1>
-    <div class="subtitle">Fijás los rasgos de los primeros humanos y el mundo en que viven. Después mirás qué hacen: se dispersan buscando comida, se dividen en tribus, pelean por la tierra, se alían, inventan cosas y a veces las olvidan.</div>
-  </header>
-
-  <div class="status-bar">
-    <span>Año <b id="yearOut">0</b></span>
-    <span>Población <b id="popOut">–</b></span>
-    <span>Naciones <b id="natOut">–</b></span>
-    <span>Guerras en curso <b id="warOut">0</b></span>
-    <span>Potencia dominante <b id="domOut">–</b></span>
-    <span>Inventos <b id="descOut">0</b></span>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">🏛️</span>
+    <div>
+      <h1>Crónica de una civilización</h1>
+      <p class="tagline">Elegí un mundo, soltá a los primeros humanos y mirá qué hacen.</p>
+    </div>
   </div>
-  <div class="hitos" id="hitos"></div>
+  <div class="clock"><span class="era" id="eraOut">Antes de empezar</span><span class="year">Año <b id="yearOut">0</b></span></div>
+  <div class="transport">
+    <button class="play" id="playBtn">▶ Empezar</button>
+    <button class="ghost" id="stepBtn" title="Avanzar un solo año">+1 año</button>
+    <div class="speed" id="speedChips" role="group" aria-label="Velocidad, en años por segundo"></div>
+    <select id="speedSel" aria-label="Velocidad" hidden>
+      <option value="1">1 año/s</option>
+      <option value="2.5" selected>2,5 años/s</option>
+      <option value="6">6 años/s</option>
+      <option value="15">15 años/s</option>
+      <option value="40">40 años/s</option>
+      <option value="100">100 años/s</option>
+      <option value="250">250 años/s</option>
+    </select>
+    <button class="ghost" id="resetBtn" title="Volver a armar una partida desde cero">Nueva partida</button>
+  </div>
+</header>
 
-  <div class="grid">
-    <aside class="panel" id="controlPanel">
-      <h2>Parámetros iniciales</h2>
-      <div class="field">
-        <label>Semilla</label>
-        <div class="seed-row">
-          <input type="text" id="seedInput" value="" aria-label="Semilla">
-          <button id="diceBtn" title="Sortear semilla y parámetros" aria-label="Sortear semilla y parámetros">🎲</button>
-        </div>
+<div class="layout">
+  <aside class="side" id="controlPanel">
+    <section class="setup" id="setupPanel" aria-label="Armá tu partida">
+      <h2 class="step"><span class="num">1</span>Elegí el mundo</h2>
+      <div class="worlds" role="radiogroup" aria-label="Tipo de mundo">
+        <button class="world" id="sapiensBtn" data-world="sapiens" role="radio">
+          <span class="w-ico" aria-hidden="true">🧬</span>
+          <span class="w-t">La historia humana</span>
+          <span class="w-d">Un grupo de sapiens en el valle del Omo, sobre la Tierra real. Arranca lento, como la prehistoria.</span>
+        </button>
+        <button class="world" data-world="nuevo" role="radio">
+          <span class="w-ico" aria-hidden="true">🌍</span>
+          <span class="w-t">Un mundo nuevo</span>
+          <span class="w-d">Continentes inventados a partir de una semilla. Cada semilla es otra historia.</span>
+        </button>
+        <button class="world" data-world="lienzo" role="radio">
+          <span class="w-ico" aria-hidden="true">🖌️</span>
+          <span class="w-t">Lienzo en blanco</span>
+          <span class="w-d">Un océano vacío para que pintes tu propia geografía con el pincel del mapa.</span>
+        </button>
       </div>
-      <div class="field">
-        <label for="geoSel">Geografía</label>
-        <select id="geoSel">
+      <div class="world-opts" id="worldOpts">
+        <div class="field" id="shapeField"><span class="lbl">Forma</span><div class="chips" id="geoChips"></div></div>
+        <div class="field" id="sizeField"><span class="lbl">Tamaño <small id="sizeHint"></small></span><div class="chips" id="sizeChips"></div></div>
+        <div class="field" id="seedField">
+          <label class="lbl" for="seedInput">Semilla</label>
+          <div class="seed-row"><input type="text" id="seedInput" value="" spellcheck="false"><button id="diceBtn" title="Sortear semilla, forma y ajustes">🎲 Sortear</button></div>
+          <small class="help">La misma semilla con los mismos ajustes da siempre la misma historia.</small>
+        </div>
+        <select id="geoSel" hidden aria-hidden="true">
           <option value="continente">Un continente</option>
           <option value="dos">Dos continentes</option>
           <option value="pangea">Tierra extensa</option>
           <option value="islas">Archipiélago</option>
           <option value="tierra">La Tierra (continentes reales)</option>
-          <option value="vacio">Lienzo en blanco (océano para pintar)</option>
+          <option value="vacio">Lienzo en blanco</option>
+        </select>
+        <select id="sizeSel" hidden aria-hidden="true">
+          <option value="15">Chico</option>
+          <option value="30" selected>Mediano</option>
+          <option value="60">Grande</option>
+          <option value="120">Enorme</option>
         </select>
       </div>
-      <button id="sapiensBtn" style="width:100%;margin:0 0 14px">🧬 Empezar como Homo sapiens, en África</button>
-      <div class="field">
-        <label for="sizeSel">Tamaño del mundo</label>
-        <select id="sizeSel">
-          <option value="15">Chico (como la península ibérica)</option>
-          <option value="30" selected>Mediano (como Europa occidental)</option>
-          <option value="60">Grande (como África)</option>
-          <option value="120">Enorme (como Eurasia)</option>
-        </select>
-      </div>
+
+      <h2 class="step"><span class="num">2</span>Ajustá a la gente <small>opcional</small></h2>
+      <p class="help">Los valores de partida ya dan una buena historia. Tocá un grupo para abrirlo.</p>
       <div id="sliders"></div>
-      <div class="controls-row">
-        <button class="primary" id="playBtn">▶ Iniciar</button>
-        <button id="stepBtn">Paso +1</button>
-        <button id="resetBtn">↺ Reiniciar</button>
-      </div>
-      <div class="controls-row">
-        <select id="speedSel" aria-label="Velocidad">
-          <option value="1">1 año/s</option>
-          <option value="2.5" selected>2,5 años/s</option>
-          <option value="6">6 años/s</option>
-          <option value="15">15 años/s</option>
-          <option value="40">40 años/s</option>
-          <option value="100">100 años/s</option>
-          <option value="250">250 años/s</option>
-        </select>
-      </div>
-      <div class="note">🧬 carga un grupo de sapiens en el valle del Omo (Etiopía), sobre la Tierra real, con un ritmo de innovación lento. 🎲 sortea semilla, geografía y parámetros. La misma semilla con los mismos parámetros da siempre la misma historia. Los parámetros se bloquean mientras corre.</div>
+      <button class="linkish" id="defaultsBtn">Volver a los valores de partida</button>
 
-      <h2 class="sub">La humanidad en promedio</h2>
-      <div class="stat-summary">
-        <div>Fuerza<b id="sFuerza">–</b></div>
-        <div>Intelecto<b id="sIntelecto">–</b></div>
-        <div>Cooperación<b id="sCoop">–</b></div>
-        <div>Resistencia<b id="sRes">–</b></div>
-      </div>
-    </aside>
+      <button class="start" id="startBtn">▶ Empezar la historia</button>
+      <p class="help center">Mientras corre, los ajustes quedan fijos. Con “Nueva partida” volvés a esta pantalla.</p>
+    </section>
 
-    <div class="col">
-      <section class="panel">
-        <div class="panel-head">
-          <h2>El mundo</h2>
-          <div class="seg" id="mapModes" role="group" aria-label="Vista del mapa">
-            <button data-mode="politico" class="on">Político</button>
-            <button data-mode="terreno">Terreno</button>
-            <button data-mode="recursos">Recursos</button>
-            <button data-mode="culto">Creencias</button>
-          </div>
+    <section class="live" aria-label="La partida">
+      <div class="means">
+        <h2>La humanidad en promedio</h2>
+        <div class="stat-summary">
+          <div>💪 Fuerza<b id="sFuerza">–</b></div>
+          <div>💡 Intelecto<b id="sIntelecto">–</b></div>
+          <div>🤝 Cooperación<b id="sCoop">–</b></div>
+          <div>🛡️ Resistencia<b id="sRes">–</b></div>
         </div>
-        <div class="map-wrap" id="mapWrap">
-          <div class="map-hud" id="mapHud">
-            <div class="hud-time"><span class="hud-era" id="hudEra">Paleolítico</span><span class="hud-year" id="hudYearWrap">Año <b id="hudYear">0</b></span></div>
-            <div class="hud-stats"><span title="Población">👥 <b id="hudPop">–</b></span><span title="Naciones">🏳️ <b id="hudNat">–</b></span><span title="Guerras en curso">⚔️ <b id="hudWar">0</b></span></div>
-            <div class="hud-ctrl">
-              <button id="hudPlay" aria-label="Iniciar o pausar">▶</button>
-              <button id="hudSpeed" title="Velocidad">2,5×</button>
-              <button id="hudCam" class="only-cine on" title="Cámara automática: sigue lo que pasa">🎥</button>
-              <button id="hudCine" title="Modo cine: oculta los datos y te muestra lo que va pasando">🎬</button>
-            </div>
-          </div>
-          <div class="cine-caption" id="cineCaption" aria-live="polite"></div>
-          <div class="map-tools" id="mapTools">
-            <div class="seg tools" role="group" aria-label="Herramientas del mapa">
-              <button data-tool="mover" class="on" title="Mover y seleccionar">🖐️</button>
-              <button data-tool="pincel" title="Pintar el mundo">🖌️</button>
-              <button data-tool="personas" title="Soltar un pueblo">👥</button>
-              <button id="cineBtn" title="Modo cine">🎬</button>
-            </div>
-            <div class="tool-opts" id="brushOpts" hidden>
-              <div class="swatches" id="swatches"></div>
-              <div class="seg sizes" id="brushSizes"><button data-r="0" title="Fino">·</button><button data-r="1" class="on" title="Medio">●</button><button data-r="3" title="Grueso">⬤</button></div>
-            </div>
-            <div class="tool-opts" id="dropOpts" hidden>
-              <span>Tamaño del pueblo</span>
-              <div class="seg" id="dropSizes"><button data-n="25" class="on">25</button><button data-n="250">250</button><button data-n="2500">2.500</button></div>
-            </div>
-          </div>
-          <canvas id="map"></canvas>
-          <div class="figcard" id="figCard" hidden></div>
-          <div class="map-placeholder" id="mapPlaceholder">Así es el mundo de esta semilla. Iniciá para poblarlo, o pintalo a tu gusto con 🖌️.</div>
-          <div class="map-zoom-controls">
-            <button id="zoomInBtn" title="Acercar" aria-label="Acercar">+</button>
-            <button id="zoomOutBtn" title="Alejar" aria-label="Alejar">−</button>
-            <button id="centerBtn" title="Ver todo el mapa" aria-label="Ver todo el mapa">⤢</button>
-            <button id="fsBtn" title="Pantalla completa" aria-label="Pantalla completa">⛶</button>
-          </div>
+      </div>
+      <section class="chronicle">
+        <div class="chron-head">
+          <h2>📜 Crónica</h2>
+          <label><input type="checkbox" id="onlySel"> Solo la nación elegida</label>
         </div>
-        <div class="legend" id="mapLegend"></div>
+        <div class="seg filters" id="logFilters" role="group" aria-label="Filtrar crónica">
+          <button data-f="hitos" class="on">Lo importante</button>
+          <button data-f="all">Todo</button>
+          <button data-f="guerra">Guerras</button>
+          <button data-f="politica">Política</button>
+          <button data-f="tecno">Inventos</button>
+          <button data-f="desastre">Desastres</button>
+          <button data-f="sociedad">Sociedad</button>
+        </div>
+        <div id="log"></div>
       </section>
+    </section>
+  </aside>
 
-      <div class="two">
-        <section class="panel">
-          <h2>Naciones</h2>
-          <div class="nlist" id="nationList"><div class="empty">Todavía no hay nadie.</div></div>
-        </section>
-        <section class="panel">
-          <h2>Nación seleccionada</h2>
-          <div class="detail" id="nationDetail"><div class="empty">Tocá una nación en la lista o en el mapa para ver su líder, su territorio, sus creencias y con quién está en guerra.</div></div>
-        </section>
+  <main class="stage">
+    <div class="stats" id="statsBar">
+      <div class="stat"><span>👥 Población</span><b id="popOut">–</b></div>
+      <div class="stat"><span>🏳️ Naciones</span><b id="natOut">–</b></div>
+      <div class="stat"><span>⚔️ Guerras</span><b id="warOut">0</b></div>
+      <div class="stat"><span>💡 Inventos</span><b id="descOut">0</b></div>
+      <div class="stat grow"><span>👑 Potencia dominante</span><b id="domOut">–</b></div>
+    </div>
+
+    <section class="mapcard">
+      <div class="map-wrap" id="mapWrap">
+        <div class="map-hud" id="mapHud">
+          <div class="hud-time"><span class="hud-era" id="hudEra">Paleolítico</span><span class="hud-year" id="hudYearWrap">Año <b id="hudYear">0</b></span></div>
+          <div class="hud-stats"><span title="Población">👥 <b id="hudPop">–</b></span><span title="Naciones">🏳️ <b id="hudNat">–</b></span><span title="Guerras en curso">⚔️ <b id="hudWar">0</b></span></div>
+          <div class="hud-ctrl">
+            <button id="hudPlay" aria-label="Jugar o pausar">▶</button>
+            <button id="hudSpeed" title="Velocidad">2,5×</button>
+            <button id="hudCam" class="only-cine on" title="Cámara automática: sigue lo que pasa">🎥</button>
+            <button id="hudCine" title="Modo cine: oculta los datos y te muestra lo que va pasando">🎬</button>
+          </div>
+        </div>
+        <div class="cine-caption" id="cineCaption" aria-live="polite"></div>
+        <div class="map-modes seg" id="mapModes" role="group" aria-label="Qué muestra el mapa">
+          <button data-mode="politico" class="on">🏳️ Naciones</button>
+          <button data-mode="terreno">⛰️ Terreno</button>
+          <button data-mode="recursos">🌾 Recursos</button>
+          <button data-mode="culto">✨ Creencias</button>
+        </div>
+        <div class="map-tools" id="mapTools">
+          <div class="seg tools" role="group" aria-label="Herramientas del mapa">
+            <button data-tool="mover" class="on" title="Mover y elegir">🖐️</button>
+            <button data-tool="pincel" title="Pintar el mundo">🖌️</button>
+            <button data-tool="personas" title="Soltar un pueblo">👥</button>
+            <button id="cineBtn" title="Modo cine">🎬</button>
+          </div>
+          <div class="tool-opts" id="brushOpts" hidden>
+            <div class="swatches" id="swatches"></div>
+            <div class="seg sizes" id="brushSizes"><button data-r="0" title="Fino">·</button><button data-r="1" class="on" title="Medio">●</button><button data-r="3" title="Grueso">⬤</button></div>
+          </div>
+          <div class="tool-opts" id="dropOpts" hidden>
+            <span>Tamaño del pueblo</span>
+            <div class="seg" id="dropSizes"><button data-n="25" class="on">25</button><button data-n="250">250</button><button data-n="2500">2.500</button></div>
+          </div>
+        </div>
+        <canvas id="map"></canvas>
+        <div class="figcard" id="figCard" hidden></div>
+        <div class="map-placeholder" id="mapPlaceholder">Así es el mundo de esta semilla. Empezá para poblarlo, o pintalo a tu gusto con 🖌️.</div>
+        <div class="map-zoom-controls">
+          <button id="zoomInBtn" title="Acercar" aria-label="Acercar">+</button>
+          <button id="zoomOutBtn" title="Alejar" aria-label="Alejar">−</button>
+          <button id="centerBtn" title="Ver todo el mapa" aria-label="Ver todo el mapa">⤢</button>
+          <button id="fsBtn" title="Pantalla completa" aria-label="Pantalla completa">⛶</button>
+        </div>
       </div>
+      <div class="legend" id="mapLegend"></div>
+    </section>
 
-      <section class="panel" id="figPanel">
-        <div class="panel-head">
-          <h2>Personajes de la historia</h2>
+    <section class="firsts">
+      <h2>Primeros inventos del mundo</h2>
+      <div class="hitos" id="hitos"><span class="empty">Todavía nadie inventó nada.</span></div>
+    </section>
+
+    <section class="dock">
+      <div class="tabs" id="dockTabs" role="tablist" aria-label="Detalles de la partida">
+        <button role="tab" data-tab="naciones" aria-selected="true">🏳️ Naciones</button>
+        <button role="tab" data-tab="personajes" aria-selected="false">⭐ Personajes</button>
+        <button role="tab" data-tab="graficos" aria-selected="false">📈 Gráficos</button>
+      </div>
+      <div class="pane" data-pane="naciones" role="tabpanel">
+        <div class="two">
+          <div>
+            <h3 class="pane-h">Todas las naciones</h3>
+            <div class="nlist" id="nationList"><div class="empty">Todavía no hay nadie.</div></div>
+          </div>
+          <div>
+            <h3 class="pane-h">Nación elegida</h3>
+            <div class="detail" id="nationDetail"><div class="empty">Tocá una nación en la lista o en el mapa para ver su líder, su territorio, sus creencias y con quién está en guerra.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="pane" data-pane="personajes" id="figPanel" role="tabpanel" hidden>
+        <div class="pane-top">
+          <h3 class="pane-h">Personajes de la historia</h3>
           <div class="seg" id="figTabs" role="group" aria-label="Personajes">
             <button data-t="vivos" class="on">Vivos</button>
             <button data-t="grandes">Grandes figuras</button>
@@ -352,45 +546,30 @@
           <div class="nlist" id="figList"><div class="empty">Todavía no hay personajes.</div></div>
           <div class="detail" id="figDetail"><div class="empty">Tocá un personaje (acá, en la crónica o en el mapa) para ver su vida.</div></div>
         </div>
-      </section>
-
-      <div class="two">
-        <section class="panel">
-          <h2>Población por nación</h2>
-          <canvas class="chart" id="chartPop"></canvas>
-          <div class="legend" id="popLegend"></div>
-        </section>
-        <section class="panel">
-          <h2>Rasgos promedio en el tiempo</h2>
-          <canvas class="chart" id="chartTraits"></canvas>
-          <div class="legend">
-            <span><i class="dot" style="background:#d0604f"></i>Fuerza</span>
-            <span><i class="dot" style="background:#6a9aab"></i>Intelecto</span>
-            <span><i class="dot" style="background:#8fae62"></i>Cooperación</span>
-            <span><i class="dot" style="background:#c9a34f"></i>Resistencia</span>
-          </div>
-        </section>
       </div>
-
-      <section class="chronicle">
-        <div class="chron-head">
-          <h2>Crónica</h2>
-          <div class="seg" id="logFilters" role="group" aria-label="Filtrar crónica">
-            <button data-f="hitos" class="on">Puntos de inflexión</button>
-            <button data-f="all">Todo</button>
-            <button data-f="guerra">Guerras</button>
-            <button data-f="politica">Política</button>
-            <button data-f="tecno">Inventos</button>
-            <button data-f="desastre">Desastres</button>
-            <button data-f="sociedad">Sociedad</button>
+      <div class="pane" data-pane="graficos" role="tabpanel" hidden>
+        <div class="two">
+          <div>
+            <h3 class="pane-h">Población por nación</h3>
+            <canvas class="chart" id="chartPop"></canvas>
+            <div class="legend" id="popLegend"></div>
           </div>
-          <label><input type="checkbox" id="onlySel"> Solo la nación seleccionada</label>
+          <div>
+            <h3 class="pane-h">Rasgos promedio en el tiempo</h3>
+            <canvas class="chart" id="chartTraits"></canvas>
+            <div class="legend">
+              <span><i class="dot" style="background:#d0604f"></i>Fuerza</span>
+              <span><i class="dot" style="background:#6a9aab"></i>Intelecto</span>
+              <span><i class="dot" style="background:#8fae62"></i>Cooperación</span>
+              <span><i class="dot" style="background:#c9a34f"></i>Resistencia</span>
+            </div>
+          </div>
         </div>
-        <div id="log"></div>
-      </section>
-    </div>
-  </div>
+      </div>
+    </section>
+  </main>
 </div>
+
 <script>
 (function(){
 "use strict";
@@ -2430,26 +2609,35 @@ function nationById(id){ return S.nations.get(id) || S.deadNations.find(d=>d.id=
 // =====================================================================
 const $ = id => document.getElementById(id);
 const SLIDERS = [
-  ['popInit','Población inicial',6,40,1,14],
-  ['fuerza','Fuerza media',10,90,1,50],
-  ['intel','Intelecto medio',10,90,1,50],
-  ['coop','Cooperación media',10,90,1,50],
-  ['res','Resistencia media',10,90,1,50],
-  ['diversidad','Diversidad genética inicial',2,25,1,10],
-  ['h2','Heredabilidad (h²)',0.1,0.9,0.05,0.45],
-  ['mut','Variabilidad / mutación',0,30,1,12],
-  ['abund','Abundancia de recursos',10,90,1,50],
-  ['peligro','Peligrosidad del entorno',0,100,1,30],
-  ['belic','Belicosidad',0,100,1,50],
-  ['ritmo','Ritmo de innovación',0.2,2,0.05,1],
-  ['paleo','Ritmo en la Edad de Piedra',0.01,1,0.01,0.25]
+  // id, etiqueta, min, max, paso, valor de partida, grupo, extremo bajo, extremo alto, ayuda
+  ['popInit','Cuántos arrancan',6,40,1,14,'gente','pocos','muchos','El tamaño del primer grupo.'],
+  ['fuerza','Fuerza',10,90,1,50,'gente','débiles','fuertes',''],
+  ['intel','Intelecto',10,90,1,50,'gente','simples','ingeniosos','Ayuda a inventar cosas.'],
+  ['coop','Cooperación',10,90,1,50,'gente','solitarios','solidarios','Pueblos más unidos y con menos guerras civiles.'],
+  ['res','Resistencia',10,90,1,50,'gente','frágiles','resistentes','Aguantan mejor el hambre y las pestes.'],
+  ['diversidad','Diversidad genética',2,25,1,10,'herencia','parecidos','muy distintos','Cuánto se diferencian unos de otros al principio.'],
+  ['h2','Heredabilidad',0.1,0.9,0.05,0.45,'herencia','poca','mucha','Cuánto se parecen los hijos a los padres.'],
+  ['mut','Mutación',0,30,1,12,'herencia','estable','cambiante','Cuánta novedad aparece en cada generación.'],
+  ['abund','Recursos',10,90,1,50,'mundo','escasos','abundantes','Cuánta comida da la tierra.'],
+  ['peligro','Peligros del entorno',0,100,1,30,'mundo','tranquilo','hostil','Fieras, clima y enfermedades.'],
+  ['belic','Belicosidad',0,100,1,50,'mundo','pacíficos','guerreros','Qué tan fácil se pelean los pueblos.'],
+  ['ritmo','Ritmo de los inventos',0.2,2,0.05,1,'ritmo','lento','rápido',''],
+  ['paleo','Ritmo en la Edad de Piedra',0.01,1,0.01,0.25,'ritmo','lentísimo','rápido','Lo que tarda la humanidad en dejar la piedra.']
 ];
+const SLIDER_GROUPS = [
+  ['gente','🧍','La gente','fuerza, intelecto, cooperación'],
+  ['herencia','🧬','La herencia','cómo pasan los rasgos'],
+  ['mundo','🌦️','El entorno','recursos, peligros, guerras'],
+  ['ritmo','⏳','El ritmo de la historia','qué tan rápido se inventa']
+];
+const fmtVal = v => String(+(+v).toFixed(2)).replace('.',',');
 (function buildSliders(){
   const box = $('sliders');
-  box.innerHTML = SLIDERS.map(([id,label,min,max,step,def])=>
-    `<div class="field"><label for="sl_${id}">${label} <span class="val" id="v_${id}">${def}</span></label>
-     <input type="range" id="sl_${id}" min="${min}" max="${max}" step="${step}" value="${def}"></div>`).join('');
-  for (const [id] of SLIDERS){ const el=$('sl_'+id); el.addEventListener('input', ()=>{ $('v_'+id).textContent=el.value; if (id==='abund') schedulePreview(); }); }
+  box.innerHTML = SLIDER_GROUPS.map(([g,ico,title,desc])=>`<details class="sgroup" ${g==='gente'?'open':''}><summary><span class="gi" aria-hidden="true">${ico}</span><span class="gt">${title}<span class="gd">${desc}</span></span></summary><div class="sbody">`+
+    SLIDERS.filter(r=>r[6]===g).map(([id,label,min,max,step,def,,lo,hi,hint])=>
+    `<div class="slider"><div class="top"><label for="sl_${id}">${label}</label><span class="val" id="v_${id}">${fmtVal(def)}</span></div>${hint?`<div class="hint">${hint}</div>`:''}
+     <input type="range" id="sl_${id}" min="${min}" max="${max}" step="${step}" value="${def}"><div class="ends" aria-hidden="true"><span>${lo}</span><span>${hi}</span></div></div>`).join('')+'</div></details>').join('');
+  for (const [id] of SLIDERS){ const el=$('sl_'+id); el.addEventListener('input', ()=>{ $('v_'+id).textContent=fmtVal(el.value); if (id==='abund') schedulePreview(); }); }
 })();
 function readParams(){
   const p = {seed: $('seedInput').value.trim() || String(Date.now()), geo: $('geoSel').value, km: +$('sizeSel').value};
@@ -2459,7 +2647,8 @@ function readParams(){
 }
 function setControlsDisabled(dis){
   for (const [id] of SLIDERS) $('sl_'+id).disabled = dis;
-  ['seedInput','diceBtn','geoSel','sapiensBtn','sizeSel'].forEach(id=>$(id).disabled=dis);
+  ['seedInput','diceBtn','geoSel','sapiensBtn','sizeSel','startBtn','defaultsBtn'].forEach(id=>$(id).disabled=dis);
+  document.querySelectorAll('.world, #geoChips button, #sizeChips button').forEach(b=>b.disabled=dis);
   if (!dis) $('sizeSel').disabled = $('geoSel').value==='tierra';
 }
 
@@ -2546,6 +2735,53 @@ function fitZoom(){ const dpr=dprNow(); return Math.min(mapCanvas.clientWidth*dp
 function fitCamera(){ camera.zoom = fitZoom()*0.98; camera.x = W*CELL_PX/2; camera.y = H*CELL_PX/2; }
 function clampZoom(z){ return clamp(z, fitZoom()*0.6, 16); }
 
+
+// ---------- figuritas de personas ----------
+// Pixel art de 7×10 (con borde, 9×12), precalculado una vez por color de nación en una tira:
+// 4 tonos de piel × 3 colores de pelo × 2 pasos. Dibujar es un solo drawImage por persona.
+const PERSON_ART = [
+  '..hhh..',
+  '.hhhhh.',
+  '.hsssh.',
+  '.seses.',
+  '.psssp.',
+  '.bbbbb.',
+  'sbbbbbs',
+  '.bdddb.',
+  ['..l.l..', '.l...l.'],
+  '..ooo..'
+];
+const SKINS = [[242,207,168],[220,170,124],[185,130,90],[138,90,60]];
+const HAIRS = [[43,35,32],[90,58,34],[150,98,48]];
+const PSW = 9, PSH = 12, PQ = 0.3;   // tamaño del sprite y de cada "pixel" en px de mundo
+const personAtlases = new Map();
+function personAtlas(color){
+  let c = personAtlases.get(color); if (c) return c;
+  if (personAtlases.size>240) personAtlases.clear();
+  c = document.createElement('canvas'); c.width = PSW*24; c.height = PSH;
+  const g = c.getContext('2d'), img = g.createImageData(c.width, c.height), d = img.data;
+  const body = hexToRgb(color), dark = body.map(v=>v*0.7|0);
+  const set = (x,y,rgb,a)=>{ const i=(y*c.width+x)*4; d[i]=rgb[0]; d[i+1]=rgb[1]; d[i+2]=rgb[2]; d[i+3]=a; };
+  let idx=0;
+  for (let sk=0; sk<4; sk++) for (let hr=0; hr<3; hr++) for (let fr=0; fr<2; fr++, idx++){
+    const skin=SKINS[sk], blush=skin.map((v,k)=>v*0.7+[235,120,120][k]*0.3|0);
+    const pal = {h:HAIRS[hr], s:skin, e:[30,26,26], p:blush, b:body, d:dark, l:[70,54,42]};
+    const ox = idx*PSW + 1, solid = new Uint8Array(PSW*PSH);
+    PERSON_ART.forEach((row,y)=>{ const r = Array.isArray(row) ? row[fr] : row;
+      for (let x=0; x<7; x++){ const ch=r[x]; if (ch==='.') continue;
+        if (ch==='o'){ set(ox+x, y+1, [0,0,0], 55); continue; }
+        set(ox+x, y+1, pal[ch], 255); solid[(y+1)*PSW + x+1]=1; } });
+    // borde oscuro suave: se lee bien sobre pasto, arena o nieve
+    for (let y=0; y<PSH; y++) for (let x=0; x<PSW; x++){
+      if (solid[y*PSW+x]) continue;
+      let n=0; for (const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const xx=x+dx, yy=y+dy; if (xx>=0&&yy>=0&&xx<PSW&&yy<PSH&&solid[yy*PSW+xx]) n++; }
+      if (n) set(idx*PSW+x, y, [22,24,32], 150);
+    }
+  }
+  g.putImageData(img,0,0);
+  personAtlases.set(color, c); return c;
+}
+
 // ---------- animación de personas ----------
 // Figuras visuales: cada asentamiento muestra tantas figuritas como gente representa la escala.
 // Son solo decorado: la población real vive en los conteos por edad del motor.
@@ -2570,10 +2806,12 @@ function updatePeople(dt){
     for (const p of b.spr){
       if (Math.random() < dt*0.4 || p.fresh){
         p.fresh = false;
-        for (let t=0;t<4;t++){ const a=Math.random()*Math.PI*2, d=Math.sqrt(Math.random())*r, ox=Math.cos(a)*d, oy=Math.sin(a)*d;
-          if (!isWaterAt(b.x+ox+0.5, b.y+oy+0.5) || t===3){ p.ox=ox; p.oy=oy; break; } }
+        let ok=false; for (let t=0;t<6;t++){ const a=Math.random()*Math.PI*2, d=Math.sqrt(Math.random())*r*(t>2?0.5:1), ox=Math.cos(a)*d, oy=Math.sin(a)*d;
+          if (!isWaterAt(b.x+ox+0.5, b.y+oy+0.5)){ p.ox=ox; p.oy=oy; ok=true; break; } }
+        if (!ok){ p.ox=(Math.random()-0.5)*0.3; p.oy=(Math.random()-0.5)*0.3; } // sin tierra cerca: se quedan junto al pueblo, no en el agua
       }
       const tx=b.x+p.ox, ty=b.y+p.oy, dx=tx-p.x, dy=ty-p.y, L=Math.hypot(dx,dy);
+      p.mv = L>0.02;
       if (L>12){ p.x=tx; p.y=ty; continue; }
       const sp = Math.min(L, (L>3?5:1.4*SF*1.5)*dt); // paso de persona, medido en figuras y no en regiones
       if (L>0.001){ p.x += dx/L*sp; p.y += dy/L*sp; }
@@ -3439,10 +3677,12 @@ function drawMap(now){
           const c=cy*W+cx; if (cc[c]>=PER_CELL) continue; cc[c]++;
           vis.push(p);
         }
-        ctx.fillStyle = n.color;
-        for (const p of vis){ const x=p.x*CELL_PX, y=p.y*CELL_PX, k=(p.kid?0.7:1)*SZ; ctx.fillRect(x-0.9*k, y-1.4*k, 1.8*k, 2.4*k); }
-        ctx.fillStyle='#e0b88c';
-        for (const p of vis){ const x=p.x*CELL_PX, y=p.y*CELL_PX, k=(p.kid?0.7:1)*SZ; ctx.fillRect(x-0.65*k, y-2.6*k, 1.3*k, 1.2*k); }
+        // un solo drawImage por persona, desde la tira precalculada del color de su nación
+        const atlas = personAtlas(n.color), tone = (b.nation*7+3)&3, step = reduceMotion ? 0 : Math.floor(now/170);
+        for (const p of vis){
+          const q = (p.kid?0.72:1)*PQ, sk = (p.k*5+b.id)%6===0 ? (tone+1)&3 : tone, hr = (p.k*7+b.id)%3, fr = (p.mv && ((step+p.k)&1)) ? 1 : 0;
+          ctx.drawImage(atlas, ((sk*3+hr)*2+fr)*PSW, 0, PSW, PSH, p.x*CELL_PX - PSW*q/2, p.y*CELL_PX - (PSH-1.5)*q, PSW*q, PSH*q);
+        }
       }
     }
     // frentes de guerra
@@ -3498,7 +3738,7 @@ function relState(r, me){
   return ['', r.v>30?'amistad':'paz'];
 }
 function updateStatus(){
-  $('yearOut').textContent = S ? S.year : 0;
+  $('yearOut').textContent = S ? fmtN(S.year) : 0; $('eraOut').textContent = S ? worldEra() : 'Antes de empezar';
   $('popOut').textContent = S ? fmtN(S.popTotal) : '–';
   $('natOut').textContent = S ? S.nations.size : '–';
   $('warOut').textContent = S ? S.wars.length : 0;
@@ -3513,7 +3753,7 @@ function updateStatus(){
 }
 let hitosCount = -1;
 function updateHitos(){
-  const el=$('hitos'); if (!S){ el.innerHTML=''; hitosCount=-1; return; }
+  const el=$('hitos'); if (!S || !Object.keys(S.firsts).length){ el.innerHTML='<span class="empty">Todavía nadie inventó nada.</span>'; hitosCount=S?0:-1; return; }
   const ids = Object.keys(S.firsts); if (ids.length===hitosCount) return; hitosCount=ids.length;
   el.innerHTML = ids.sort((a,b)=>S.firsts[a].year-S.firsts[b].year).map(id=>{ const f=S.firsts[id], d=DISC_BY_ID[id];
     return `<span class="hito" title="Inventado por los ${f.name} en el año ${f.year}"><i style="--c:${f.color}"></i>${d.emoji} ${d.name} <small>${f.name}, año ${f.year}</small></span>`; }).join('');
@@ -3613,7 +3853,7 @@ function renderFigDetail(){
 function showFigure(id, scroll){
   if (!S || !S.figs.has(id)) return;
   selectedFig = id; updateFigures(true);
-  if (scroll) $('figPanel').scrollIntoView({behavior:'smooth', block:'start'});
+  if (scroll){ openTab('personajes'); $('figPanel').scrollIntoView({behavior:'smooth', block:'start'}); }
 }
 function showFigCard(f){
   const c=$('figCard'), n=figNation(f);
@@ -3720,7 +3960,7 @@ $('geoSel').addEventListener('change', ()=>{ $('sizeSel').disabled = $('geoSel')
 const SAPIENS = {seed:'omo-kibish', geo:'tierra', popInit:24, fuerza:55, intel:55, coop:60, res:52, diversidad:12, h2:0.45, mut:10, abund:45, peligro:40, belic:45, ritmo:0.15, paleo:0.03};
 $('sapiensBtn').addEventListener('click', ()=>{
   $('seedInput').value = SAPIENS.seed; $('geoSel').value = SAPIENS.geo; $('sizeSel').disabled = true;
-  for (const [id] of SLIDERS){ if (SAPIENS[id]==null) continue; $('sl_'+id).value = SAPIENS[id]; $('v_'+id).textContent = $('sl_'+id).value; }
+  for (const [id] of SLIDERS){ if (SAPIENS[id]==null) continue; $('sl_'+id).value = SAPIENS[id]; $('v_'+id).textContent = fmtVal($('sl_'+id).value); }
   schedulePreview();
 });
 $('diceBtn').addEventListener('click', ()=>{
@@ -3732,7 +3972,7 @@ $('diceBtn').addEventListener('click', ()=>{
   for (const [id,,min,max,step,def] of SLIDERS){
     const u = (t()+t()+t())/3*2-1, half = u<0 ? def-min : max-def;
     let v = clamp(Math.round((def + u*half*0.7)/step)*step, min, max); v = +v.toFixed(2);
-    $('sl_'+id).value = v; $('v_'+id).textContent = $('sl_'+id).value;
+    $('sl_'+id).value = v; $('v_'+id).textContent = fmtVal($('sl_'+id).value);
   }
   const geos=['continente','dos','pangea','islas','tierra']; $('geoSel').value = geos[Math.floor(t()*geos.length)];
   schedulePreview();
@@ -3748,25 +3988,25 @@ function ensureStarted(){
   if (!p.world) p.world = Wd;
   if (pendingStart!=null) p.startCell = pendingStart;
   newState(p);
-  previewWorld=null; camera.zoom=null; setControlsDisabled(true);
+  previewWorld=null; camera.zoom=null; setControlsDisabled(true); document.body.classList.add('playing');
   $('mapPlaceholder').style.display='none';
   terrainDirty=true; updateAllPanels();
 }
 function setRunning(v){
-  running=v; $('playBtn').textContent = v ? '⏸ Pausar' : (S ? '▶ Continuar' : '▶ Iniciar'); if (typeof updateHud==='function') updateHud();
+  running=v; $('playBtn').textContent = v ? '⏸ Pausar' : (S ? '▶ Seguir' : '▶ Empezar'); $('playBtn').setAttribute('aria-pressed', v?'true':'false'); if (typeof updateHud==='function') updateHud();
 }
 $('playBtn').addEventListener('click', ()=>{ ensureStarted(); if (!S || S.ended) return; setRunning(!running); });
 $('stepBtn').addEventListener('click', ()=>{ ensureStarted(); if (!S) return; setRunning(false); if (!S.ended){ tick(); drainEvents(); terrainDirty=true; updateAllPanels(); drawCharts(); if (S.ended) showEnded(); } });
 function showEnded(){
   setRunning(false); $('playBtn').disabled=true; $('stepBtn').disabled=true;
   const ph=$('mapPlaceholder'); ph.style.display='';
-  ph.innerHTML = `La humanidad se extinguió en el año ${S.year}. Tocá ↺ Reiniciar para probar otro mundo: más cooperación, resistencia o población inicial la ayudan a pasar las primeras generaciones.`;
+  ph.innerHTML = `La humanidad se extinguió en el año ${S.year}. Tocá “Nueva partida” para probar otro mundo: más cooperación, resistencia o población inicial la ayudan a pasar las primeras generaciones.`;
   updateAllPanels(); drawCharts();
 }
 $('resetBtn').addEventListener('click', ()=>{
-  S=null; WORLD=null; setRunning(false); acc=0;
+  S=null; WORLD=null; setRunning(false); acc=0; document.body.classList.remove('playing');
   setControlsDisabled(false); $('playBtn').disabled=false; $('stepBtn').disabled=false;
-  $('mapPlaceholder').style.display=''; $('mapPlaceholder').textContent='Así es el mundo de esta semilla. Iniciá para poblarlo, o pintalo a tu gusto con 🖌️.';
+  $('mapPlaceholder').style.display=''; $('mapPlaceholder').textContent='Así es el mundo de esta semilla. Empezá para poblarlo, o pintalo a tu gusto con 🖌️.';
   camera.zoom=null; flashes=[]; battles=[]; fires=[]; fx=[]; ships=[]; roads=[]; planes=[]; rockets=[]; selectedFig=null; $('figCard').hidden=true;
   makePreview(); updateAllPanels(); drawCharts();
   $('nationList').innerHTML='<div class="empty">Todavía no hay nadie.</div>';
@@ -3781,7 +4021,7 @@ $('logFilters').addEventListener('click', e=>{
   logFilter=b.dataset.f; for (const x of $('logFilters').children) x.classList.toggle('on', x===b); updateLog(true);
 });
 $('onlySel').addEventListener('change', ()=>updateLog(true));
-function selectNation(id){ if (!S) return; S.selected = id; terrainDirty=true; updateNationList(); updateDetail(); updateLog(true); }
+function selectNation(id){ if (!S) return; S.selected = id; if (id!=null && currentTab==='graficos') openTab('naciones'); terrainDirty=true; updateNationList(); updateDetail(); updateLog(true); }
 $('nationList').addEventListener('click', e=>{ const r=e.target.closest('.nrow'); if (r) selectNation(+r.dataset.id); });
 $('nationList').addEventListener('keydown', e=>{ if (e.key==='Enter'||e.key===' '){ const r=e.target.closest('.nrow'); if (r){ e.preventDefault(); selectNation(+r.dataset.id); } } });
 
@@ -3894,6 +4134,7 @@ function worldEra(){
 }
 function speedLabel(){ const v=+$('speedSel').value; return (v<10 ? String(v).replace('.',',') : v)+'×'; }
 function updateHud(){
+  syncSpeedChips();
   if (!$('mapWrap').classList.contains('fs')) return;
   $('hudEra').textContent = worldEra();
   $('hudYear').textContent = S ? fmtN(S.year) : 0; $('hudPop').textContent = S ? fmtN(S.popTotal) : '–'; $('hudNat').textContent = S ? S.nations.size : '–';
@@ -3977,7 +4218,60 @@ function frame(t){
   requestAnimationFrame(frame);
 }
 updateLegend();
+
+// ---------- interfaz: armado de partida, velocidad y pestañas ----------
+let worldMode = 'nuevo', currentTab = 'naciones';
+const GEO_CHIPS = [['continente','Un continente'],['dos','Dos continentes'],['pangea','Tierra extensa'],['islas','Archipiélago'],['tierra','La Tierra real']];
+const SIZE_CHIPS = [['15','Chico','como la península ibérica'],['30','Mediano','como Europa occidental'],['60','Grande','como África'],['120','Enorme','como Eurasia']];
+function syncWorldUI(){
+  const g=$('geoSel').value, k=$('sizeSel').value;
+  if (g==='vacio') worldMode='lienzo'; else if (worldMode==='lienzo') worldMode='nuevo';
+  document.querySelectorAll('.world').forEach(b=>{ const on=b.dataset.world===worldMode; b.classList.toggle('on',on); b.setAttribute('aria-checked', on?'true':'false'); });
+  $('geoChips').innerHTML = GEO_CHIPS.map(([v,t])=>`<button data-v="${v}" class="${v===g?'on':''}" aria-pressed="${v===g}">${t}</button>`).join('');
+  $('sizeChips').innerHTML = SIZE_CHIPS.map(([v,t])=>`<button data-v="${v}" class="${v===k?'on':''}" aria-pressed="${v===k}">${t}</button>`).join('');
+  const sz = SIZE_CHIPS.find(c=>c[0]===k); $('sizeHint').textContent = sz ? sz[2] : '';
+  $('worldOpts').hidden = worldMode==='sapiens';
+  $('shapeField').hidden = worldMode!=='nuevo';
+  $('seedField').hidden = worldMode!=='nuevo';
+  $('sizeField').hidden = g==='tierra';
+}
+document.querySelector('.worlds').addEventListener('click', e=>{
+  const b=e.target.closest('.world'); if (!b || b.disabled) return;
+  const w=b.dataset.world, prev=worldMode;
+  if (w==='sapiens'){ worldMode='sapiens'; }                      // los valores los carga el botón 🧬
+  else if (w==='lienzo'){ worldMode='lienzo'; $('geoSel').value='vacio'; $('geoSel').dispatchEvent(new Event('change')); }
+  else { worldMode='nuevo'; if (prev==='sapiens') $('diceBtn').click(); else if ($('geoSel').value==='vacio'){ $('geoSel').value='continente'; $('geoSel').dispatchEvent(new Event('change')); } }
+  syncWorldUI();
+});
+$('geoChips').addEventListener('click', e=>{ const b=e.target.closest('button'); if (!b) return; $('geoSel').value=b.dataset.v; $('geoSel').dispatchEvent(new Event('change')); syncWorldUI(); });
+$('sizeChips').addEventListener('click', e=>{ const b=e.target.closest('button'); if (!b) return; $('sizeSel').value=b.dataset.v; schedulePreview(); syncWorldUI(); });
+$('diceBtn').addEventListener('click', ()=>{ worldMode='nuevo'; syncWorldUI(); });
+$('defaultsBtn').addEventListener('click', ()=>{ for (const [id,,,,,def] of SLIDERS){ $('sl_'+id).value=def; $('v_'+id).textContent=fmtVal(def); } schedulePreview(); });
+$('startBtn').addEventListener('click', ()=>{ $('playBtn').click(); window.scrollTo({top:0, behavior:'smooth'}); });
+
+// velocidad: botones en vez de un desplegable
+(function buildSpeed(){
+  const sel=$('speedSel');
+  $('speedChips').innerHTML = [...sel.options].map(o=>`<button data-v="${o.value}" aria-pressed="false">${String(o.value).replace('.',',')}</button>`).join('') + '<span class="unit">años/s</span>';
+  $('speedChips').addEventListener('click', e=>{ const b=e.target.closest('button'); if (!b) return; sel.value=b.dataset.v; updateHud(); });
+})();
+function syncSpeedChips(){ const v=$('speedSel').value; document.querySelectorAll('#speedChips button').forEach(b=>{ const on=b.dataset.v===v; b.classList.toggle('on',on); b.setAttribute('aria-pressed', on?'true':'false'); }); }
+
+// pestañas de abajo
+function openTab(t){
+  currentTab=t;
+  document.querySelectorAll('#dockTabs [role=tab]').forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===t ? 'true':'false'));
+  document.querySelectorAll('.dock .pane').forEach(p=>p.hidden = p.dataset.pane!==t);
+  if (t==='graficos') requestAnimationFrame(drawCharts);
+}
+$('dockTabs').addEventListener('click', e=>{ const b=e.target.closest('[role=tab]'); if (b) openTab(b.dataset.tab); });
+$('dockTabs').addEventListener('keydown', e=>{
+  if (e.key!=='ArrowRight' && e.key!=='ArrowLeft') return;
+  const tabs=[...document.querySelectorAll('#dockTabs [role=tab]')], i=tabs.findIndex(b=>b.dataset.tab===currentTab);
+  const n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length]; openTab(n.dataset.tab); n.focus();
+});
 $('diceBtn').click();
+syncWorldUI(); syncSpeedChips();
 makePreview();
 requestAnimationFrame(frame);
 window.__civ = { get S(){ return S; }, tick, ensureStarted, camera, drainEvents, get markers(){ return LOD.markers; } };
