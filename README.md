@@ -4,7 +4,7 @@ Simulador de civilización emergente que corre en el navegador. Agentes humanos 
 
 ## ▶️ Jugar
 
-**https://jsantiago00.github.io/cronica-de-una-civilizacion/**
+**https://jsantiago00.github.io/humanidad/**
 
 ## Cómo correrlo localmente
 
