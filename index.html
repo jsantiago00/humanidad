@@ -600,7 +600,11 @@ function pick(arr){ return arr[Math.floor(rng()*arr.length)]; }
 function chance(p){ return rng() < p; }
 function sround(x){ const f = Math.floor(x); return f + (rng() < x-f ? 1 : 0); }
 function cap1(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
-function dist(a,b){ return Math.hypot(a.x-b.x, a.y-b.y); }
+// mundo esférico: el eje X (longitud) da la vuelta: la celda W-1 es vecina de la celda 0.
+// el eje Y (latitud) no envuelve, porque no tiene sentido un mundo que dé la vuelta por los polos.
+function wrapX(x){ return ((x%W)+W)%W; }
+function dxWrap(dx){ let d=dx; const half=W/2; while(d>half) d-=W; while(d<-half) d+=W; return d; }
+function dist(a,b){ return Math.hypot(dxWrap(a.x-b.x), a.y-b.y); }
 function hslToHex(h,s,l){
   s/=100; l/=100;
   const k = n => (n + h/30) % 12, a = s*Math.min(l,1-l);
@@ -690,7 +694,7 @@ function genWorld(seed, geo, abund, km){
       river[cur]=1;
       const cx=cur%W, cy=(cur/W)|0; let best=-1, be=Infinity;
       for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++){
-        if(!dx&&!dy) continue; const x=cx+dx,y=cy+dy; if(x<0||y<0||x>=W||y>=H) continue;
+        if(!dx&&!dy) continue; const x=wrapX(cx+dx),y=cy+dy; if(y<0||y>=H) continue;
         const j=y*W+x, ev = elev[j] + r()*0.004;
         if (ev<be){ be=ev; best=j; }
       }
@@ -706,7 +710,7 @@ function finishWorld(biome, river, elev, moist, abund, cold, start){
   // aguas someras cerca de la costa
   for (let i=0;i<NC;i++) if (biome[i]===B_DEEP){
     const cx=i%W, cy=(i/W)|0; let near=false;
-    for (let dy=-2;dy<=2&&!near;dy++) for (let dx=-2;dx<=2;dx++){ const x=cx+dx,y=cy+dy; if(x>=0&&y>=0&&x<W&&y<H&&!isWater(biome[y*W+x])){near=true;break;} }
+    for (let dy=-2;dy<=2&&!near;dy++) for (let dx=-2;dx<=2;dx++){ const x=wrapX(cx+dx),y=cy+dy; if(y>=0&&y<H&&!isWater(biome[y*W+x])){near=true;break;} }
     if (near) biome[i]=B_SHALLOW;
   }
   const coast = new Uint8Array(NC), irrig = new Uint8Array(NC);
@@ -718,7 +722,7 @@ function finishWorld(biome, river, elev, moist, abund, cold, start){
     if (isWater(biome[i])) continue;
     const cx=i%W, cy=(i/W)|0; let wat=false, rivAdj=false;
     for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++){
-      const x=cx+dx,y=cy+dy; if(x<0||y<0||x>=W||y>=H) continue; const j=y*W+x;
+      const x=wrapX(cx+dx),y=cy+dy; if(y<0||y>=H) continue; const j=y*W+x;
       if (isWater(biome[j]) && (dx===0||dy===0)) wat=true;
       if (river[j]) rivAdj=true;
     }
@@ -735,7 +739,7 @@ function finishWorld(biome, river, elev, moist, abund, cold, start){
     if (isWater(biome[i]) || land[i]>=0) continue;
     const stack=[i]; land[i]=lid; let sz=0;
     while(stack.length){ const c=stack.pop(); sz++; const cx=c%W, cy=(c/W)|0;
-      for (const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const x=cx+dx,y=cy+dy; if(x<0||y<0||x>=W||y>=H) continue; const j=y*W+x;
+      for (const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const x=wrapX(cx+dx),y=cy+dy; if(y<0||y>=H) continue; const j=y*W+x;
         if (!isWater(biome[j]) && land[j]<0){ land[j]=lid; stack.push(j); } } }
     sizes.push(sz); lid++;
   }
@@ -1117,7 +1121,7 @@ function newState(params){
   S = {
     params, scale: 1, dispScale: 1, year:0, nextMilestone:100, nextPid:1, nextBandId:1, nextNationId:0,
     popTotal:0, worldMu:[50,50,50,50], figs:new Map(), bands:new Map(), nations:new Map(), deadNations:[],
-    rel:new Map(), grudge:new Map(), contacts:new Map(), wars:[], nextWarId:1,
+    rel:new Map(), grudge:new Map(), contacts:new Map(), wars:[], nextWarId:1, figRel:new Map(),
     owner:new Int16Array(NC).fill(-1), inf:new Float32Array(NC), demand:new Float32Array(NC),
     cons:new Float32Array(NC), farmed:new Uint8Array(NC), suit:new Float32Array(NC), crowd:new Float32Array(NC),
     droughts:[], epidemic:null, winter:false,
@@ -1133,7 +1137,7 @@ function newState(params){
     const v = WORLD.fert[c] - Math.hypot(cx-W/2, cy-H/2)*0.004; if (v>bv){ bv=v; best=c; } }
   if (WORLD.start>=0){
     const sx=WORLD.start%W, sy=(WORLD.start/W)|0; bv=-1;
-    for (let dy=-3;dy<=3;dy++) for (let dx=-3;dx<=3;dx++){ const x=sx+dx, y=sy+dy; if (x<0||y<0||x>=W||y>=H) continue; const c=y*W+x;
+    for (let dy=-3;dy<=3;dy++) for (let dx=-3;dx<=3;dx++){ const x=wrapX(sx+dx), y=sy+dy; if (y<0||y>=H) continue; const c=y*W+x;
       if (WORLD.land[c]>=0 && WORLD.fert[c]-Math.hypot(dx,dy)*0.02>bv){ bv=WORLD.fert[c]-Math.hypot(dx,dy)*0.02; best=c; } }
   }
   if (params.startCell!=null && WORLD.land[params.startCell]>=0) best = params.startCell;
@@ -1158,7 +1162,7 @@ function recomputeWorld(Wd, abund){
   const {biome, river} = Wd;
   for (let i=0;i<NC;i++) if (isWater(biome[i])){
     river[i]=0; const cx=i%W, cy=(i/W)|0; let near=false;
-    for (let dy=-2;dy<=2&&!near;dy++) for (let dx=-2;dx<=2;dx++){ const x=cx+dx,y=cy+dy; if(x>=0&&y>=0&&x<W&&y<H&&!isWater(biome[y*W+x])){near=true;break;} }
+    for (let dy=-2;dy<=2&&!near;dy++) for (let dx=-2;dx<=2;dx++){ const x=wrapX(cx+dx),y=cy+dy; if(y>=0&&y<H&&!isWater(biome[y*W+x])){near=true;break;} }
     biome[i] = near ? B_SHALLOW : B_DEEP;
   }
   const scale = 0.55 + abund/100*0.9;
@@ -1168,7 +1172,7 @@ function recomputeWorld(Wd, abund){
   for (let i=0;i<NC;i++){
     if (isWater(biome[i])) continue;
     const cx=i%W, cy=(i/W)|0; let wat=false, rivAdj=false;
-    for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++){ const x=cx+dx,y=cy+dy; if(x<0||y<0||x>=W||y>=H) continue; const j=y*W+x;
+    for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++){ const x=wrapX(cx+dx),y=cy+dy; if(y<0||y>=H) continue; const j=y*W+x;
       if (isWater(biome[j]) && (dx===0||dy===0)) wat=true; if (river[j]) rivAdj=true; }
     coast[i]=wat?1:0; irrig[i]=(river[i]||rivAdj)?1:0;
     let f = BF[biome[i]] + (wat?0.22:0) + (river[i]?0.30:(rivAdj?0.12:0));
@@ -1182,7 +1186,7 @@ function recomputeWorld(Wd, abund){
     if (isWater(biome[i]) || land[i]>=0) continue;
     const stack=[i]; land[i]=lid; let sz=0;
     while(stack.length){ const c=stack.pop(); sz++; const cx=c%W, cy=(c/W)|0;
-      for (const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const x=cx+dx,y=cy+dy; if(x<0||y<0||x>=W||y>=H) continue; const j=y*W+x;
+      for (const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const x=wrapX(cx+dx),y=cy+dy; if(y<0||y>=H) continue; const j=y*W+x;
         if (!isWater(biome[j]) && land[j]<0){ land[j]=lid; stack.push(j); } } }
     sizes.push(sz); lid++;
   }
@@ -1196,7 +1200,7 @@ function paintCells(Wd, cx, cy, radius, what){
   let changed=false;
   for (let dy=-radius; dy<=radius; dy++) for (let dx=-radius; dx<=radius; dx++){
     if (dx*dx+dy*dy > radius*radius+0.5) continue;
-    const x=cx+dx, y=cy+dy; if (x<0||y<0||x>=W||y>=H) continue; const c=y*W+x;
+    const x=wrapX(cx+dx), y=cy+dy; if (y<0||y>=H) continue; const c=y*W+x;
     if (what==='rio'){ if (!isWater(Wd.biome[c]) && !Wd.river[c]){ Wd.river[c]=1; changed=true; } }
     else if (what==='sinrio'){ if (Wd.river[c]){ Wd.river[c]=0; changed=true; } }
     else { const b = what===B_SHALLOW ? B_DEEP : what; if (Wd.biome[c]!==b && !(b===B_DEEP && isWater(Wd.biome[c]))){ Wd.biome[c]=b; changed=true; } }
@@ -1209,7 +1213,7 @@ function rehomeBands(){
   for (const b of [...S.bands.values()]){
     if (WORLD.land[bandCell(b)]>=0) continue;
     let best=null, bd=1e9; const cx=Math.round(b.x), cy=Math.round(b.y);
-    for (let r=1;r<=4 && !best;r++){ const o=OFFS[r]; for (let k=0;k<o.length;k+=2){ const x=cx+o[k], y=cy+o[k+1]; if (x<0||y<0||x>=W||y>=H) continue; const c=y*W+x;
+    for (let r=1;r<=4 && !best;r++){ const o=OFFS[r]; for (let k=0;k<o.length;k+=2){ const x=wrapX(cx+o[k]), y=cy+o[k+1]; if (y<0||y>=H) continue; const c=y*W+x;
       if (WORLD.land[c]>=0){ const d=o[k]*o[k]+o[k+1]*o[k+1]; if (d<bd){ bd=d; best=[x,y]; } } } }
     if (best){ b.x=best[0]; b.y=best[1]; b.tx=b.x; b.ty=b.y; }
     else { const n=bandNation(b); S.bands.delete(b.id); if (n) log(`El mar se traga ${b.place}, un asentamiento de ${NM(n)}.`, 'desastre', [n.id]); }
@@ -1533,9 +1537,20 @@ function makeHeir(n, old){
   if (age<16 || !chance(0.8)) return null;
   const b = S.bands.get(of.band) || S.bands.get(n.capital); if (!b || b.nation!==n.id) return null;
   const h2 = S.params.h2;
-  const t = TK.map((key,k)=> clamp(gauss(b.mu[k] + h2*(of[key]-b.mu[k]), Math.sqrt(b.v[k])*0.8), 1, 100));
-  const f = makeFigure(b, {traits:t, edad:age, padre:of.id, role:'heredero'});
-  figEvent(of, `Deja como heredero a ${f.name}.`);
+  const spawn = (a)=>{ const t = TK.map((key,k)=> clamp(gauss(b.mu[k] + h2*(of[key]-b.mu[k]), Math.sqrt(b.v[k])*0.8), 1, 100));
+    return makeFigure(b, {traits:t, edad:a, padre:of.id}); };
+  let f = spawn(age);
+  if (chance(0.35) && age<of.edad-18){
+    // dos hijos con derecho al trono: uno hereda, el otro queda relegado y no lo olvida
+    const sib = spawn(clamp(age+Math.round(gauss(0,5)), 16, of.edad-16));
+    const score = (x)=>x.cooperacion*0.4+x.intelecto*0.3+x.fuerza*0.3+rng()*15;
+    const [winner, loser] = score(f)>=score(sib) ? [f, sib] : [sib, f];
+    winner.roles.push('heredero'); loser.roles.push('pretendiente');
+    const r = getFigRel(winner.id, loser.id); r.v=-35; r.state='rivales';
+    figEvent(of, `Deja dos hijos con derecho al trono: ${FN(winner)} y ${FN(loser)}.`);
+    figEvent(loser, `Queda relegado tras ${FN(winner)} en la sucesión, y no lo olvida.`);
+    f = winner;
+  } else { f.roles.push('heredero'); figEvent(of, `Deja como heredero a ${f.name}.`); }
   return f;
 }
 function leaderStep(){
@@ -1569,7 +1584,7 @@ function territoryStep(){
     const rInf = clamp(Math.max(b.R||1, Math.round((3 + Math.sqrt(U(b.N))*0.8 + (b.sedentary?1:0) + (nationReach(n)/KF()-10)/6)*KF())), 1, 14);
     const str = Math.sqrt(U(b.N))+1, o = OFFS[rInf], cx=Math.round(b.x), cy=Math.round(b.y), sc = rInf*rInf*0.35;
     for (let k=0;k<o.length;k+=2){
-      const x=cx+o[k], y=cy+o[k+1]; if (x<0||y<0||x>=W||y>=H) continue;
+      const x=wrapX(cx+o[k]), y=cy+o[k+1]; if (y<0||y>=H) continue;
       const c=y*W+x; if (land[c]<0) continue;
       const v = str/(1 + (o[k]*o[k]+o[k+1]*o[k+1])/sc);
       if (v>inf[c]){ inf[c]=v; owner[c]=b.nation; }
@@ -1580,7 +1595,7 @@ function territoryStep(){
   for (let y=0;y<H;y++) for (let x=0;x<W;x++){
     const c=y*W+x, o=owner[c]; if (o<0) continue;
     S.nations.get(o).cells++;
-    if (x+1<W){ const o2=owner[c+1]; if (o2>=0 && o2!==o){ const k=pk(o,o2); border.set(k,(border.get(k)||0)+1); } }
+    const cr = y*W+((x+1)%W); { const o2=owner[cr]; if (o2>=0 && o2!==o){ const k=pk(o,o2); border.set(k,(border.get(k)||0)+1); } }
     if (y+1<H){ const o2=owner[c+W]; if (o2>=0 && o2!==o){ const k=pk(o,o2); border.set(k,(border.get(k)||0)+1); } }
   }
   // contactos: frontera compartida o asentamientos cercanos; se guarda el par de bandas más próximo (el "frente")
@@ -1588,7 +1603,7 @@ function territoryStep(){
   const bl = [...S.bands.values()], CD = Math.max(1.5, 16*KF());
   for (let i=0;i<bl.length;i++) for (let j=i+1;j<bl.length;j++){
     const a=bl[i], b=bl[j]; if (a.nation===b.nation) continue;
-    const ddx=a.x-b.x, ddy=a.y-b.y; if (ddx>CD||ddx<-CD||ddy>CD||ddy<-CD) continue;
+    const ddx=dxWrap(a.x-b.x), ddy=a.y-b.y; if (ddx>CD||ddx<-CD||ddy>CD||ddy<-CD) continue;
     const d = Math.sqrt(ddx*ddx+ddy*ddy); if (d>CD) continue;
     const k = pk(a.nation,b.nation); let ct = contacts.get(k);
     if (!ct){ ct={a:Math.min(a.nation,b.nation), b:Math.max(a.nation,b.nation), border:0, minD:Infinity, fa:null, fb:null}; contacts.set(k,ct); }
@@ -1625,21 +1640,21 @@ function bandRadiusKm(b, n){
 }
 function bandRadius(b, n){ return Math.min(8, Math.max(1, Math.round(bandRadiusKm(b,n)/WORLD.km))); }
 function farmRadius(n){ return (3 + (has(n,'domesticacion_carga')?1:0) + (has(n,'irrigacion')?1:0))*KF(); }
-function inDrought(x,y){ for (const d of S.droughts) if ((x-d.x)*(x-d.x)+(y-d.y)*(y-d.y) < d.r*d.r) return true; return false; }
+function inDrought(x,y){ for (const d of S.droughts){ const dx=dxWrap(x-d.x), dy=y-d.y; if (dx*dx+dy*dy < d.r*d.r) return true; } return false; }
 
 function foodStep(){
   const {demand, cons, farmed} = S; demand.fill(0); cons.fill(0); farmed.fill(0);
   const {land, fert, agF, irrig, res, coast} = WORLD;
   const droughtMask = new Uint8Array(NC);
-  for (const d of S.droughts){ const o=OFFS[Math.min(16,Math.ceil(d.r))]; for (let k=0;k<o.length;k+=2){ const x=Math.round(d.x)+o[k], y=Math.round(d.y)+o[k+1]; if (x>=0&&y>=0&&x<W&&y<H) droughtMask[y*W+x]=1; } }
+  for (const d of S.droughts){ const o=OFFS[Math.min(16,Math.ceil(d.r))]; for (let k=0;k<o.length;k+=2){ const x=wrapX(Math.round(d.x)+o[k]), y=Math.round(d.y)+o[k+1]; if (y>=0&&y<H) droughtMask[y*W+x]=1; } }
   const bl = [...S.bands.values()];
   for (const b of bl){
     const n = bandNation(b); b.R = bandRadius(b,n);
     const o = OFFS[b.R], cx=Math.round(b.x), cy=Math.round(b.y); let area=0;
-    for (let k=0;k<o.length;k+=2){ const x=cx+o[k], y=cy+o[k+1]; if (x<0||y<0||x>=W||y>=H) continue; if (land[y*W+x]>=0) area++; }
+    for (let k=0;k<o.length;k+=2){ const x=wrapX(cx+o[k]), y=cy+o[k+1]; if (y<0||y>=H) continue; if (land[y*W+x]>=0) area++; }
     b.area = Math.max(1,area);
     const w = U(b.N)/b.area;
-    for (let k=0;k<o.length;k+=2){ const x=cx+o[k], y=cy+o[k+1]; if (x<0||y<0||x>=W||y>=H) continue; const c=y*W+x; if (land[c]>=0) demand[c]+=w; }
+    for (let k=0;k<o.length;k+=2){ const x=wrapX(cx+o[k]), y=cy+o[k+1]; if (y<0||y>=H) continue; const c=y*W+x; if (land[c]>=0) demand[c]+=w; }
   }
   for (const b of bl){
     const n = bandNation(b); const fF = forageMult(n), fA = agriMult(n), navB = has(n,'navegacion')?1.3:1;
@@ -1649,7 +1664,7 @@ function foodStep(){
     let sup=0;
     b._cells = [];
     for (let k=0;k<o.length;k+=2){
-      const x=cx+o[k], y=cy+o[k+1]; if (x<0||y<0||x>=W||y>=H) continue;
+      const x=wrapX(cx+o[k]), y=cy+o[k+1]; if (y<0||y>=H) continue;
       const c=y*W+x; if (land[c]<0) continue;
       const q = res[c]/Math.max(fert[c],0.01);
       let food = res[c]*fF*(coast[c]?navB:1);
@@ -1933,9 +1948,10 @@ function hostileTo(n, otherId){
   return r.state==='guerra' || r.v < -40;
 }
 function cellValue(b, n, x, y, forChild){
-  if (x<0||y<0||x>=W||y>=H) return -1;
+  if (y<0||y>=H) return -1;
+  x = wrapX(x);
   const c = y*W+x; if (WORLD.land[c]<0) return -1;
-  const d = Math.hypot(x-b.x, y-b.y);
+  const d = Math.hypot(dxWrap(x-b.x), y-b.y);
   // un grupo que se muda deja libre su zona; un grupo hijo, en cambio, compite con sus padres
   const own = forChild ? 0 : (U(b.N)/b.area)*Math.max(0, 1-d/(2*b.R));
   const crowdEx = Math.max(0, S.crowd[c]-own);
@@ -1951,20 +1967,20 @@ function cellValue(b, n, x, y, forChild){
     S._hostile.set(n.id, hb);
   }
   for (const ob of hb){
-    const dd = (ob.x-x)**2+(ob.y-y)**2;
+    const ddx=dxWrap(ob.x-x), dd = ddx*ddx+(ob.y-y)**2;
     if (dd<81*KF()*KF()+0.5 && ob.N>b.N*0.7) v *= 0.6;
   }
   return v;
 }
 function canReach(n, fromCell, toCell){ return WORLD.land[fromCell]===WORLD.land[toCell] || has(n,'navegacion') || has(n,'aviacion'); }
-function bandCell(b){ return clamp(Math.round(b.y),0,H-1)*W + clamp(Math.round(b.x),0,W-1); }
+function bandCell(b){ return clamp(Math.round(b.y),0,H-1)*W + wrapX(Math.round(b.x)); }
 
 function settleStep(){
   for (const b of S.bands.values()){
     const n = bandNation(b);
     if (b.sedentary || !has(n,'agricultura')) continue;
     let s=0, k=0; const o=OFFS[cellsR(3)], cx=Math.round(b.x), cy=Math.round(b.y);
-    for (let i=0;i<o.length;i+=2){ const x=cx+o[i], y=cy+o[i+1]; if (x<0||y<0||x>=W||y>=H) continue; const c=y*W+x; if (WORLD.land[c]>=0){ s+=WORLD.agF[c]; k++; } }
+    for (let i=0;i<o.length;i+=2){ const x=wrapX(cx+o[i]), y=cy+o[i+1]; if (y<0||y>=H) continue; const c=y*W+x; if (WORLD.land[c]>=0){ s+=WORLD.agF[c]; k++; } }
     if (k && s/k > 0.45 && rng()<0.25){
       b.sedentary = true;
       if (!n.settledLogged && n.pop>=SC(10)){ n.settledLogged=true;
@@ -1988,8 +2004,8 @@ function moveStep(){
       let best=null, bv=here*1.1+0.02;
       for (let k=0;k<9;k++){
         const a=rng()*Math.PI*2, d=Math.max(0.8, (3+rng()*7)*KF());
-        const x=Math.round(b.x+Math.cos(a)*d), y=Math.round(b.y+Math.sin(a)*d);
-        if (x<0||y<0||x>=W||y>=H) continue;
+        const x=wrapX(Math.round(b.x+Math.cos(a)*d)), y=Math.round(b.y+Math.sin(a)*d);
+        if (y<0||y>=H) continue;
         if (!canReach(n, bandCell(b), y*W+x) || WORLD.land[y*W+x]<0) continue;
         const v = cellValue(b, n, x, y);
         if (v>bv){ bv=v; best=[x,y]; }
@@ -1997,11 +2013,11 @@ function moveStep(){
       if (best){ b.tx=best[0]; b.ty=best[1]; } else { b.tx=b.x; b.ty=b.y; }
       b.retarget = S.year + 3;
     }
-    const dx=b.tx-b.x, dy=b.ty-b.y, L=Math.hypot(dx,dy);
+    const dx=dxWrap(b.tx-b.x), dy=b.ty-b.y, L=Math.hypot(dx,dy);
     if (L>0.3*KF()){
       const step = Math.min(L, (1.3 + (has(n,'domesticacion_carga')?0.6:0))*KF());   // ~30-50 km por año
-      const nx=b.x+dx/L*step, ny=b.y+dy/L*step;
-      const c = clamp(Math.round(ny),0,H-1)*W+clamp(Math.round(nx),0,W-1);
+      const nx=wrapX(b.x+dx/L*step), ny=b.y+dy/L*step;
+      const c = clamp(Math.round(ny),0,H-1)*W+wrapX(Math.round(nx));
       if (WORLD.land[c]>=0 || has(n,'navegacion')){ b.x=nx; b.y=ny; }
       else { b.tx=b.x; b.ty=b.y; }
     }
@@ -2027,8 +2043,8 @@ function fissionStep(){
     for (let k=0;k<(nav?22:16);k++){
       // con navegación, algunos intentos apuntan a costas lejanas (saltos de isla en isla)
       const a=rng()*Math.PI*2, d=(k>=16 ? maxD*(1+rng()) : 4+rng()*(maxD-4))*KF();
-      const fx=b.x+Math.cos(a)*d, fy=b.y+Math.sin(a)*d, x=Math.round(fx), y=Math.round(fy);
-      if (x<0||y<0||x>=W||y>=H) continue; const c=y*W+x;
+      const fx=wrapX(b.x+Math.cos(a)*d), fy=b.y+Math.sin(a)*d, x=wrapX(Math.round(fx)), y=Math.round(fy);
+      if (y<0||y>=H) continue; const c=y*W+x;
       if (WORLD.land[c]<0 || !canReach(n, bandCell(b), c)) continue;
       let v = cellValue(b, n, x, y, true);
       if (v>bv){ bv=v; best=[fx,fy]; cross = WORLD.land[c]!==WORLD.land[bandCell(b)]; }
@@ -2036,7 +2052,7 @@ function fissionStep(){
     if (!best){ b.circ = Math.min(10,(b.circ||0)+1); continue; } // circunscripto: no hay adónde ir
     // presupuesto de asentamientos (por rendimiento): los pioneros hacia tierras vacías siempre pueden ir;
     // dentro de tierras ya ocupadas, cuando hay muchos grupos, dividirse cuesta más
-    { const oc = S.owner[clamp(Math.round(best[1]),0,H-1)*W+clamp(Math.round(best[0]),0,W-1)];
+    { const oc = S.owner[clamp(Math.round(best[1]),0,H-1)*W+wrapX(Math.round(best[0]))];
       if (oc>=0 && !chance(clamp((260 - S.bands.size)/80, 0.03, 1))) continue; }
     b.circ = Math.max(0,(b.circ||0)-1);
     // se van los menos cooperativos (truncamiento de la campana de cooperación, con ruido)
@@ -2135,6 +2151,68 @@ function power(n){
 }
 function alliesOf(n){ const out=[]; for (const r of S.rel.values()) if (r.state==='alianza' && (r.a===n.id||r.b===n.id)){ const o=nat(r.a===n.id?r.b:r.a); if (o&&o.alive) out.push(o); } return out; }
 function vassalsOf(n){ const out=[]; for (const r of S.rel.values()) if (r.state==='tributo' && r.overlord===n.id){ const o=nat(r.vassal); if (o&&o.alive) out.push(o); } return out; }
+
+// =====================================================================
+// Relaciones personales entre figuras: amistad, rivalidad, romance y traición.
+// Solo entre "notables" (alguien con al menos un rol) para no explotar en O(n²).
+// =====================================================================
+function getFigRel(a,b){
+  const k=pk(a,b); let r=S.figRel.get(k);
+  if (!r){ r={a:Math.min(a,b), b:Math.max(a,b), v:0, state:'conocidos', tag:null, since:S.year}; S.figRel.set(k,r); }
+  return r;
+}
+function figRelOf(f){
+  const out=[];
+  for (const r of S.figRel.values()){
+    if (r.a!==f.id && r.b!==f.id) continue;
+    const other = S.figs.get(r.a===f.id ? r.b : r.a); if (!other) continue;
+    out.push({other, r});
+  }
+  out.sort((x,y)=>Math.abs(y.r.v)-Math.abs(x.r.v));
+  return out;
+}
+function stepFigPair(f1, f2, crossNation){
+  const r = getFigRel(f1.id, f2.id);
+  const compat = 1 - (Math.abs(f1.cooperacion-f2.cooperacion)+Math.abs(f1.intelecto-f2.intelecto))/140;
+  let dv = compat*3 + gauss(0,3);
+  const rivalPuesto = (f1.roles.includes('heredero')||f1.roles.includes('pretendiente')) && (f2.roles.includes('heredero')||f2.roles.includes('pretendiente'));
+  if (rivalPuesto) dv -= 4;
+  // un momento que marca el vínculo para bien o para mal (una cacería compartida, un desaire)
+  if (chance(0.03)) dv += (chance(0.6)?1:-1) * (8+rng()*12);
+  r.v = clamp(r.v + dv - r.v*0.025, -100, 100);
+  const wasState = r.state;
+  r.state = r.v>75?'grandes amigos': r.v>28?'amigos': r.v< -60?'enemigos':(r.v< -25?'rivales':'conocidos');
+  if (!r.tag && r.state!==wasState){
+    if (r.state==='amigos' && chance(0.4)){
+      figEvent(f1, `Se hace amigo de ${FN(f2)}.`); figEvent(f2, `Se hace amigo de ${FN(f1)}.`);
+    } else if (r.state==='grandes amigos' && !crossNation && Math.abs(f1.edad-f2.edad)<18 && chance(0.05)){
+      r.tag='pareja';
+      figEvent(f1, `Se enamora de ${FN(f2)}.`); figEvent(f2, `Se enamora de ${FN(f1)}.`);
+      log(`💞 ${FN(f1)} y ${FN(f2)} se enamoran.`, 'sociedad', [...new Set([f1.nation,f2.nation])]);
+    } else if (r.state==='enemigos' && chance(0.12)){
+      r.tag='traicion';
+      if (!f1.roles.includes('traidor')) f1.roles.push('traidor');
+      figEvent(f1, `Traiciona a ${FN(f2)}.`); figEvent(f2, `Es traicionado por ${FN(f1)}.`);
+      log(`🗡️ ${FN(f1)} traiciona a ${FN(f2)}.`, 'politica', [...new Set([f1.nation,f2.nation])]);
+    }
+  }
+  if (crossNation && f1.nation!==f2.nation){
+    const rn = getRel(f1.nation, f2.nation);
+    rn.v = clamp(rn.v + dv*0.5, -100, 100);
+  }
+}
+function figRelStep(){
+  for (const n of S.nations.values()){
+    if (!n.pop) continue;
+    const notables = [...S.figs.values()].filter(f=>f.died==null && f.nation===n.id && f.edad>=14 && f.roles.length);
+    for (let i=0;i<notables.length;i++) for (let j=i+1;j<notables.length;j++) stepFigPair(notables[i], notables[j]);
+  }
+  for (const ct of S.contacts.values()){
+    const A=nat(ct.a), B=nat(ct.b); if (!A||!B||!A.leader||!B.leader) continue;
+    const fa=aliveFig(A.leader.pid), fb=aliveFig(B.leader.pid); if (!fa||!fb) continue;
+    stepFigPair(fa, fb, true);
+  }
+}
 
 function relationStep(){
   for (const ct of S.contacts.values()){
@@ -2338,8 +2416,8 @@ function warStep(){
 function circumscribed(b){
   // Carneiro: sin tierras libres alrededor (agua, montaña o vecinos), huir no es opción
   let blocked=0, tot=0; const o=OFFS[cellsR(7)], cx=Math.round(b.x), cy=Math.round(b.y);
-  for (let k=0;k<o.length;k+=2){ const x=cx+o[k], y=cy+o[k+1]; tot++;
-    if (x<0||y<0||x>=W||y>=H){ blocked++; continue; } const c=y*W+x;
+  for (let k=0;k<o.length;k+=2){ const x=wrapX(cx+o[k]), y=cy+o[k+1]; tot++;
+    if (y<0||y>=H){ blocked++; continue; } const c=y*W+x;
     if (WORLD.land[c]<0 || WORLD.biome[c]===B_MOUNT || WORLD.biome[c]===B_DESERT || WORLD.biome[c]===B_ICE || (S.owner[c]>=0 && S.owner[c]!==b.nation)) blocked++; }
   return blocked/tot > 0.6;
 }
@@ -2358,10 +2436,10 @@ function captureBand(W_, L, band, war){
     // huida: buscan tierras lejos del invasor
     let best=null, bv=-1;
     for (let k=0;k<14;k++){
-      const a=rng()*Math.PI*2, d=Math.max(1,(7+rng()*8)*KF()), x=Math.round(band.x+Math.cos(a)*d), y=Math.round(band.y+Math.sin(a)*d);
-      if (x<0||y<0||x>=W||y>=H) continue; const c=y*W+x;
+      const a=rng()*Math.PI*2, d=Math.max(1,(7+rng()*8)*KF()), x=wrapX(Math.round(band.x+Math.cos(a)*d)), y=Math.round(band.y+Math.sin(a)*d);
+      if (y<0||y>=H) continue; const c=y*W+x;
       if (WORLD.land[c]<0 || WORLD.land[c]!==WORLD.land[bandCell(band)] || S.owner[c]===W_.id) continue;
-      let dmin=Infinity; for (const ob of W_.bandsArr) dmin=Math.min(dmin, Math.hypot(ob.x-x,ob.y-y));
+      let dmin=Infinity; for (const ob of W_.bandsArr){ const ddx=dxWrap(ob.x-x); dmin=Math.min(dmin, Math.hypot(ddx,ob.y-y)); }
       const v = S.suit[c]*(dmin/(10*KF()));
       if (v>bv){ bv=v; best=[x,y]; }
     }
@@ -2445,7 +2523,27 @@ function civilWarStep(){
     const rebelPop = rebels.reduce((s,b)=>s+b.N,0);
     n.asabiya = Math.min(0.97, n.asabiya+0.12);
     aggregateNation(R); aggregateNation(n);
-    { const L=chooseLeader(R); const f=L&&S.figs.get(L.pid); if (f){ f.roles.push('rebelde'); figEvent(f, `Encabeza la rebelión contra los ${n.name} y funda la nación de los ${R.name}.`); } }
+    { // si hay un pretendiente/general con rencor real contra el líder, la rebelión tiene cara conocida; si no, un desconocido
+      const oldLeaderFig = n.leader && aliveFig(n.leader.pid);
+      let traitor=null, worst=-25;
+      if (oldLeaderFig){
+        const rebelBandIds = new Set(rebels.map(b=>b.id));
+        for (const f of S.figs.values()){
+          if (f.died!=null || !rebelBandIds.has(f.band) || f===oldLeaderFig) continue;
+          if (!f.roles.some(rr=>rr==='pretendiente'||rr==='general'||rr==='heredero')) continue;
+          const rr = S.figRel.get(pk(f.id, oldLeaderFig.id)); if (!rr || rr.v>=worst) continue;
+          worst = rr.v; traitor = f;
+        }
+      }
+      if (traitor){
+        const L = chooseLeader(R, traitor);
+        if (!traitor.roles.includes('rebelde')) traitor.roles.push('rebelde');
+        figEvent(traitor, `Traiciona a ${FN(oldLeaderFig)} y encabeza la rebelión contra los ${n.name}, fundando la nación de los ${R.name}.`);
+      } else {
+        const L=chooseLeader(R); const f=L&&S.figs.get(L.pid);
+        if (f){ f.roles.push('rebelde'); figEvent(f, `Encabeza la rebelión contra los ${n.name} y funda la nación de los ${R.name}.`); }
+      }
+    }
     log(`<span class="ico">🔥</span>Guerra civil entre ${NM(n)}: ${rebels.length===1?'la provincia de '+rebels[0].place:'las provincias de '+rebels.slice(0,3).map(b=>b.place).join(', ')} (${fmtN(rebelPop)} personas) ${rebels.length===1?'se alza':'se alzan'} bajo ${leaderLabel(R)} y proclaman una nación propia: ${NM(R)}.`, 'guerra', [n.id,R.id], rebelPop>=Math.max(SC(120), S.popTotal*0.05));
     const r = getRel(n.id,R.id); r.v=-50; r.logged=true;
     if (chance(0.75)) declareWar(n, R, 'para recuperar las provincias rebeldes', false);
@@ -2810,6 +2908,7 @@ function tick(){
   warStep();
   nuclearStep();
   compact();
+  figRelStep();
   civilWarStep();
   cultureStep();
   sportsStep();
@@ -3129,7 +3228,7 @@ const TAU = Math.PI*2;
 let riverMask = null;
 function isRiverPx(wx,wy){ if (!riverMask) return false; const x=Math.floor(wx/CELL_PX*TPX), y=Math.floor(wy/CELL_PX*TPX); if (x<0||y<0||x>=W*TPX||y>=H*TPX) return false;
   for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++){ const xx=x+dx, yy=y+dy; if (xx>=0&&yy>=0&&xx<W*TPX&&yy<H*TPX&&riverMask[yy*W*TPX+xx]) return true; } return false; }
-function isWaterAt(x,y){ const cx=Math.floor(x), cy=Math.floor(y); if (cx<0||cy<0||cx>=W||cy>=H) return true; return isWater(WORLD.biome[cy*W+cx]); }
+function isWaterAt(x,y){ const cx=wrapX(Math.floor(x)), cy=Math.floor(y); if (cy<0||cy>=H) return true; return isWater(WORLD.biome[cy*W+cx]); }
 function shade(hex, f){ const c=hexToRgb(hex); return `rgb(${Math.min(255,c[0]*f)|0},${Math.min(255,c[1]*f)|0},${Math.min(255,c[2]*f)|0})`; }
 function smokePuffs(ctx, x, y, now, seed, scale, dark, alpha){
   for (let k=0;k<3;k++){
@@ -3282,7 +3381,7 @@ function updateDrawSky(ctx, now, dt, cssZ){
 function waterDir(b){
   // dirección hacia el agua más cercana (para muelles y barcos)
   const cx=Math.round(b.x), cy=Math.round(b.y); let best=null, bd=99;
-  for (let r=1;r<=3;r++){ const o=OFFS[r]; for (let k=0;k<o.length;k+=2){ const x=cx+o[k], y=cy+o[k+1]; if (x<0||y<0||x>=W||y>=H) continue;
+  for (let r=1;r<=3;r++){ const o=OFFS[r]; for (let k=0;k<o.length;k+=2){ const x=wrapX(cx+o[k]), y=cy+o[k+1]; if (y<0||y>=H) continue;
     if (isWater(WORLD.biome[y*W+x])){ const d=o[k]*o[k]+o[k+1]*o[k+1]; if (d<bd){ bd=d; best=[x+0.5,y+0.5]; } } } if (best) break; }
   return best;
 }
@@ -3640,7 +3739,7 @@ function syncShips(now){
     }
   }
 }
-function waterPath(x1,y1,x2,y2){ const L=Math.hypot(x2-x1,y2-y1), n=Math.max(2,Math.ceil(L*1.5)); for (let i=1;i<=n;i++){ const t=i/n; if (!isWaterAt(x1+(x2-x1)*t, y1+(y2-y1)*t)) return false; } return true; }
+function waterPath(x1,y1,x2,y2){ const dx=dxWrap(x2-x1), dy=y2-y1, L=Math.hypot(dx,dy), n=Math.max(2,Math.ceil(L*1.5)); for (let i=1;i<=n;i++){ const t=i/n; if (!isWaterAt(x1+dx*t, y1+dy*t)) return false; } return true; }
 function pickShipTarget(sh, now){
   const home = S.bands.get(sh.home); if (!home) return;
   const n = nat(sh.nation);
@@ -3674,24 +3773,24 @@ function updateShips(dt, now){
   if (!S) return;
   for (const sh of ships){
     if (sh.sinking) continue;
-    if (sh.tx==null || Math.hypot(sh.tx-sh.x, sh.ty-sh.y)<0.3*SF){
+    if (sh.tx==null || Math.hypot(dxWrap(sh.tx-sh.x), sh.ty-sh.y)<0.3*SF){
       if (sh.mode==='guerra' && sh.target && S.bands.has(sh.target) && Math.random()<0.7){ sh.tx=null; }
       pickShipTarget(sh, now);
       sh.wait = now + (sh.mode==='pesca' ? 600+Math.random()*2200 : 300);
     }
     if (sh.wait && now<sh.wait) continue;
-    const dx=sh.tx-sh.x, dy=sh.ty-sh.y, L=Math.hypot(dx,dy);
+    const dx=dxWrap(sh.tx-sh.x), dy=sh.ty-sh.y, L=Math.hypot(dx,dy);
     const sp = ({canoa:0.9, velero:1.5, galeon:1.25, vapor:2.2, carguero:2.6}[sh.type]||1.3)*dt*0.45;
     const ta = Math.atan2(dy,dx); let da = ta-sh.ang; while (da>Math.PI) da-=TAU; while (da<-Math.PI) da+=TAU;
     sh.ang += clamp(da, -2.5*dt, 2.5*dt);
-    const nx = sh.x+Math.cos(sh.ang)*Math.min(sp,L), ny = sh.y+Math.sin(sh.ang)*Math.min(sp,L);
+    const nx = wrapX(sh.x+Math.cos(sh.ang)*Math.min(sp,L)), ny = sh.y+Math.sin(sh.ang)*Math.min(sp,L);
     if (isWaterAt(nx,ny)){ sh.x=nx; sh.y=ny; } else { sh.tx=null; }
     // estela
     if (!reduceMotion && LOD.detailed && Math.random()<dt*5) addFx({k:'wake', x:sh.x-Math.cos(sh.ang)*0.6*SF, y:sh.y-Math.sin(sh.ang)*0.6*SF, t0:now, life:900});
     // cañonazos contra la costa enemiga
     if (sh.mode==='guerra' && (sh.type==='galeon'||sh.type==='vapor'||sh.type==='carguero') && now>sh.nextShot && !reduceMotion){
       const eb = S.bands.get(sh.target);
-      if (eb && Math.hypot(eb.x-sh.x, eb.y-sh.y)<4.5){
+      if (eb && Math.hypot(dxWrap(eb.x-sh.x), eb.y-sh.y)<4.5){
         sh.nextShot = now + 900 + Math.random()*900;
         const side = Math.sin(sh.ang - Math.atan2(eb.y-sh.y, eb.x-sh.x))>0 ? -1 : 1;
         const mx = sh.x + Math.cos(sh.ang+side*Math.PI/2)*0.35*SF, my = sh.y + Math.sin(sh.ang+side*Math.PI/2)*0.35*SF;
@@ -4010,13 +4109,15 @@ function drawMap(now){
   ctx.fillStyle = 'rgb(30,74,112)'; ctx.fillRect(0,0,w,h);
   ctx.save();
   ctx.translate(w/2,h/2); ctx.scale(camera.zoom,camera.zoom); ctx.translate(-camera.x,-camera.y);
-  ctx.drawImage(terrainCache,0,0,W*CELL_PX,H*CELL_PX);
-  if (S && (mapMode==='politico'||mapMode==='culto')) ctx.drawImage(overlay,0,0,W*CELL_PX,H*CELL_PX);
   const z = camera.zoom, cssZ = z/dpr;
   // nivel de detalle: de lejos, íconos simples; de cerca, cada persona, casa y soldado
   const detailed = cssZ >= DETAIL_ZOOM;
   LOD.detailed = detailed;
   const m = 40, vx0 = camera.x-w/2/z-m, vx1 = camera.x+w/2/z+m, vy0 = camera.y-h/2/z-m, vy1 = camera.y+h/2/z+m;
+  // mundo esférico: el terreno se repite en X para que panear más allá del borde no muestre un vacío
+  const Wpx = W*CELL_PX, k0 = Math.floor(vx0/Wpx)-1, k1 = Math.floor(vx1/Wpx)+1;
+  for (let k=k0;k<=k1;k++) ctx.drawImage(terrainCache, k*Wpx, 0, Wpx, H*CELL_PX);
+  if (S && (mapMode==='politico'||mapMode==='culto')) for (let k=k0;k<=k1;k++) ctx.drawImage(overlay, k*Wpx, 0, Wpx, H*CELL_PX);
   const inView = (x,y)=> x>=vx0 && x<=vx1 && y>=vy0 && y<=vy1;
   LOD.inView = inView;
   if (S){
@@ -4044,7 +4145,7 @@ function drawMap(now){
         for (const p of b.spr){
           if (b.sedentary && p.k%5>1) continue; // en los pueblos se ve solo una parte de la gente, para no tapar los edificios
           if (hot.length && hot.some(([hx,hy])=>(p.x-hx)*(p.x-hx)+(p.y-hy)*(p.y-hy)<0.5)) continue;
-          const cx=Math.floor(p.x+0.5), cy=Math.floor(p.y+0.5); if (cx<0||cy<0||cx>=W||cy>=H) continue;
+          const cx=wrapX(Math.floor(p.x+0.5)), cy=Math.floor(p.y+0.5); if (cy<0||cy>=H) continue;
           const c=cy*W+cx; if (cc[c]>=PER_CELL) continue; cc[c]++;
           vis.push(p);
         }
@@ -4185,8 +4286,8 @@ function updateDetail(){
   const gb=$('goNation'); if (gb) gb.onclick=()=>{ const b=S.bands.get(n.capital); if (b){ camera.x=b.x*CELL_PX; camera.y=b.y*CELL_PX; camera.zoom=clampZoom(Math.max(camera.zoom, fitZoom()*2.2, dprNow()*1.6)); } };
 }
 // ---------- personajes ----------
-const ROLE_LABEL = {'deportista':'🏅 Deportista','líder':'👑 Líder','heredero':'Heredero','genio':'💡 Genio','inventor':'⚙️ Inventor','fundador':'🏳️ Fundador','rebelde':'🔥 Rebelde','profeta':'✨ Profeta','general':'⚔️ General'};
-const ROLE_W = {'líder':3,'heredero':0.3,'genio':3,'inventor':6,'fundador':3,'rebelde':2.5,'profeta':2,'general':2};
+const ROLE_LABEL = {'deportista':'🏅 Deportista','líder':'👑 Líder','heredero':'Heredero','genio':'💡 Genio','inventor':'⚙️ Inventor','fundador':'🏳️ Fundador','rebelde':'🔥 Rebelde','profeta':'✨ Profeta','general':'⚔️ General','pretendiente':'Pretendiente','traidor':'🗡️ Traidor'};
+const ROLE_W = {'líder':3,'heredero':0.3,'genio':3,'inventor':6,'fundador':3,'rebelde':2.5,'profeta':2,'general':2,'pretendiente':0.3,'traidor':1.5};
 function figScore(f){ let s=0; for (const r of f.roles) s += ROLE_W[r]||1; const nn=nationById(f.nation); if (f.roles.includes('líder') && nn) s += Math.min(4, U(nn.peak||0)/300); return s + f.events.length*0.25; }
 function figNation(f){ return nationById(f.nation); }
 function figMainRole(f){ const order=['inventor','fundador','líder','rebelde','profeta','general','genio','heredero']; for (const r of order) if (f.roles.includes(r)) return r; return f.roles[0]||''; }
@@ -4217,6 +4318,8 @@ function renderFigDetail(){
     <div class="tags">${f.roles.map(r=>`<span class="role">${ROLE_LABEL[r]||r}</span>`).join('')}${f.trait?`<span class="role">carácter ${LEADER_TRAITS[f.trait].label}</span>`:''}</div>
     <div>${traitBar('Fuerza',f.fuerza)}${traitBar('Intelecto',f.intelecto)}${traitBar('Cooperación',f.cooperacion)}${traitBar('Resistencia',f.resistencia)}</div>
     ${padre||hijos.length?`<div class="kv">${padre?`<span>Padre o madre</span><span>${FN(padre, padre.name+(padre.epithet?' '+padre.epithet:''))}</span>`:''}${hijos.length?`<span>Descendencia</span><span>${hijos.map(h=>FN(h)).join(', ')}</span>`:''}</div>`:''}
+    ${(()=>{ const rels=figRelOf(f).slice(0,5); if (!rels.length) return '';
+      return `<div class="kv">${rels.map(({other,r})=>`<span>${r.tag==='pareja'?'💞 pareja':r.tag==='traicion'?'🗡️ traición':r.state}</span><span>${FN(other)}</span>`).join('')}</div>`; })()}
     <h3>Su vida</h3>
     <div class="timeline">${f.events.map(e=>`<div><b>${e.year}</b>${e.text}</div>`).join('') || '<div class="empty">Sin hechos registrados.</div>'}</div>
     ${f.died==null?'<div><button id="goFig">Ver en el mapa</button></div>':''}`;
@@ -4404,7 +4507,7 @@ function eventCell(e){
   const r=mapCanvas.getBoundingClientRect(), dpr=dprNow();
   const sx=(e.clientX-r.left)*dpr, sy=(e.clientY-r.top)*dpr;
   const mx=(sx-mapCanvas.width/2)/camera.zoom+camera.x, my=(sy-mapCanvas.height/2)/camera.zoom+camera.y;
-  return [Math.floor(mx/CELL_PX), Math.floor(my/CELL_PX)];
+  return [wrapX(Math.floor(mx/CELL_PX)), Math.floor(my/CELL_PX)];
 }
 let painting=false, lastPaint=null, paintDirty=false;
 function paintAt(e){
@@ -4448,7 +4551,7 @@ function endPointer(e){
   if (tool==='personas' && e.type==='pointerup' && wasSingle && Math.hypot(e.clientX-downX, e.clientY-downY)<6){
     pointers.delete(e.pointerId); dragging=false;
     const [cx,cy] = eventCell(e); const Wd = WORLD || previewWorld;
-    if (!Wd || cx<0||cy<0||cx>=W||cy>=H || Wd.land[cy*W+cx]<0){ flashMsg('Tiene que ser en tierra firme.'); return; }
+    if (!Wd || cy<0||cy>=H || Wd.land[cy*W+cx]<0){ flashMsg('Tiene que ser en tierra firme.'); return; }
     if (!S){ pendingStart = cy*W+cx; ensureStarted(); pendingStart = null; }
     else { const n = dropPeople(cx, cy, dropN); if (n){ S.selected = n.id; updateAllPanels(); } }
     return;
