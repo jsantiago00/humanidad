@@ -3132,6 +3132,10 @@ function buildTerrain(){
 let camera = {x:W*CELL_PX/2, y:H*CELL_PX/2, zoom:null};
 const mapCanvas = $('map');
 function dprNow(){ return Math.min(2, window.devicePixelRatio||1); }
+// posición de pantalla más cercana a la cámara para un punto del mundo (en px): elige la copia
+// del mundo -oeste, la actual o +este- que quede más cerca, para que panear cruzando la costura
+// muestre el pueblo o barco del otro lado en vez de un salto al vacío.
+function scrX(x){ const Wpx=W*CELL_PX, half=Wpx/2; let d=x-camera.x; if (d>half) x-=Wpx; else if (d<-half) x+=Wpx; return x; }
 function fitZoom(){ const dpr=dprNow(); return Math.min(mapCanvas.clientWidth*dpr/(W*CELL_PX), mapCanvas.clientHeight*dpr/(H*CELL_PX)); }
 function fitCamera(){ camera.zoom = fitZoom()*0.98; camera.x = W*CELL_PX/2; camera.y = H*CELL_PX/2; }
 function clampZoom(z){ return clamp(z, fitZoom()*0.6, 16); }
@@ -3254,9 +3258,10 @@ function computeRoads(){
       for (const o of n.bandsArr){ if (o===b) continue; const d=dist(b,o); if (d<bd){ bd=d; best=o; } }
       if (!best) continue;
       const k = b.id<best.id ? b.id+'-'+best.id : best.id+'-'+b.id; if (seen.has(k)) continue; seen.add(k);
-      // no cruzar el mar con un camino
-      let ok=true; for (let t=0.2;t<1;t+=0.2) if (isWaterAt(b.x+(best.x-b.x)*t+0.5, b.y+(best.y-b.y)*t+0.5)) { ok=false; break; }
-      if (ok){ const r=[b.x,b.y,best.x,best.y,kind]; r.elec=elec; roads.push(r); }
+      // no cruzar el mar con un camino; la ruta va por el lado corto si el vecino queda cerca cruzando la costura
+      const bx2 = b.x+dxWrap(best.x-b.x);
+      let ok=true; for (let t=0.2;t<1;t+=0.2) if (isWaterAt(b.x+(bx2-b.x)*t+0.5, b.y+(best.y-b.y)*t+0.5)) { ok=false; break; }
+      if (ok){ const r=[b.x,b.y,bx2,best.y,kind]; r.elec=elec; roads.push(r); }
     }
   }
 }
@@ -3264,7 +3269,8 @@ function drawRoads(ctx){
   ctx.lineCap='round';
   for (const [x1,y1,x2,y2,kind] of roads){
     const mx=(x1+x2)/2 + (y2-y1)*0.08, my=(y1+y2)/2 - (x2-x1)*0.08;
-    ctx.beginPath(); ctx.moveTo(x1*CELL_PX,y1*CELL_PX); ctx.quadraticCurveTo(mx*CELL_PX,my*CELL_PX,x2*CELL_PX,y2*CELL_PX);
+    const sx1=scrX(x1*CELL_PX), shift=sx1-x1*CELL_PX;
+    ctx.beginPath(); ctx.moveTo(sx1,y1*CELL_PX); ctx.quadraticCurveTo(mx*CELL_PX+shift,my*CELL_PX,x2*CELL_PX+shift,y2*CELL_PX);
     if (kind==='autopista'){
       ctx.strokeStyle='rgba(58,58,62,0.95)'; ctx.lineWidth=3.4; ctx.stroke();
       ctx.setLineDash([1.6,1.4]); ctx.strokeStyle='rgba(240,230,160,0.9)'; ctx.lineWidth=0.4; ctx.stroke(); ctx.setLineDash([]);
@@ -3288,24 +3294,26 @@ function drawVehicles(ctx, now){
   for (let i=0;i<roads.length;i++){
     const [x1,y1,x2,y2,kind] = roads[i];
     if (!LOD.inView(x1*CELL_PX,y1*CELL_PX) && !LOD.inView(x2*CELL_PX,y2*CELL_PX)) continue;
-    const L = Math.hypot(x2-x1,y2-y1)+0.5;
+    const L = Math.hypot(x2-x1,y2-y1)+0.5, shift = scrX(x1*CELL_PX)-x1*CELL_PX;
     if (kind==='riel'){
       // un tren que va y vuelve
       const ph = ((now/(L*900/SF*0.6)) + i*0.37) % 2, t = ph<1 ? ph : 2-ph, dir = ph<1 ? 1 : -1;
       for (let w=0; w<3; w++){
         const tt = clamp(t - dir*w*0.05/Math.max(0.3,L/6), 0, 1);
-        const [px,py] = segPoint(x1,y1,x2,y2,tt), [qx,qy] = segPoint(x1,y1,x2,y2,clamp(tt+0.01,0,1));
+        const [px0,py] = segPoint(x1,y1,x2,y2,tt), [qx0,qy] = segPoint(x1,y1,x2,y2,clamp(tt+0.01,0,1));
+        const px=px0+shift, qx=qx0+shift;
         const ang = Math.atan2(qy-py, qx-px);
         ctx.save(); ctx.translate(px,py); ctx.rotate(ang);
         ctx.fillStyle = w===0 ? '#2a2a30' : (w===1 ? '#8a3a2a' : '#6a5a3a'); ctx.fillRect(-1.8,-1,3.6,2);
         if (w===0){ ctx.fillStyle='#c83a2a'; ctx.fillRect(dir>0?1.1:-1.8,-1,0.7,2); }
         ctx.restore();
-        if (w===0 && !roads[i].elec && Math.random()<0.08) puff(px/CELL_PX, py/CELL_PX-0.2*SF, now, 0.9, false, 900);
+        if (w===0 && !roads[i].elec && Math.random()<0.08) puff(px0/CELL_PX, py/CELL_PX-0.2*SF, now, 0.9, false, 900);
       }
     } else if (kind==='autopista'){
       for (let c=0;c<3;c++){
         const fwd = c%2===0, t = ((now/(L*520/SF*0.6)) + i*0.23 + c*0.33) % 1, tt = fwd ? t : 1-t;
-        const [px,py] = segPoint(x1,y1,x2,y2,tt), [qx,qy] = segPoint(x1,y1,x2,y2,clamp(tt+0.01,0,1));
+        const [px0,py] = segPoint(x1,y1,x2,y2,tt), [qx0,qy] = segPoint(x1,y1,x2,y2,clamp(tt+0.01,0,1));
+        const px=px0+shift, qx=qx0+shift;
         const ang = Math.atan2(qy-py, qx-px), off = fwd ? 0.6 : -0.6;
         ctx.save(); ctx.translate(px - Math.sin(ang)*off, py + Math.cos(ang)*off); ctx.rotate(ang);
         ctx.fillStyle = ['#d8423a','#e8c040','#3a7ad8','#eeeeee','#40a860'][(i+c)%5]; ctx.fillRect(-1,-0.55,2,1.1);
@@ -3408,9 +3416,10 @@ function buildingList(b, n){
   return L;
 }
 function slotPos(b, k){
-  if (k===0) return [b.x*CELL_PX, b.y*CELL_PX];
+  const bx = scrX(b.x*CELL_PX);
+  if (k===0) return [bx, b.y*CELL_PX];
   const a = k*2.39996 + b.id, r = (0.55+Math.sqrt(k)*0.62)*SPR;
-  return [b.x*CELL_PX+Math.cos(a)*r, b.y*CELL_PX+Math.sin(a)*r];
+  return [bx+Math.cos(a)*r, b.y*CELL_PX+Math.sin(a)*r];
 }
 function drawHouse(ctx, x, y, n, kind, tall, now, seed){
   const s = SPR;
@@ -3585,7 +3594,7 @@ function drawBuilding(ctx, kind, x, y, n, now, seed){
 function extrasR(m){ return m>3 ? 1.9 + (m-4)*0.3 : 1.6; }
 function hutsR0(m){ return m>3 ? extrasR(m) + 1.1 : 2.5; }
 function drawSettlement(ctx, b, n, now){
-  const s = SPR, cx=b.x*CELL_PX, cy=b.y*CELL_PX;
+  const s = SPR, cx=scrX(b.x*CELL_PX), cy=b.y*CELL_PX;
   const extras = buildingList(b,n);
   const stone = has(n,'construccion_piedra'), wood = has(n,'construccion_madera');
   const huts = b.sedentary ? Math.min(16, Math.ceil(U(b.N)/9)) : Math.min(3, Math.ceil(U(b.N)/14));
@@ -3596,7 +3605,7 @@ function drawSettlement(ctx, b, n, now){
   if (has(n,'navegacion') && b.sedentary){
     const wd = waterDir(b);
     if (wd){
-      let tx=wd[0]*CELL_PX, ty=wd[1]*CELL_PX;
+      let tx=cx+dxWrap(wd[0]-b.x)*CELL_PX, ty=wd[1]*CELL_PX;
       ctx.strokeStyle='#6a4a2a'; ctx.lineWidth=2.2; ctx.lineCap='butt';
       // el muelle cruza la línea de costa: un tramo corto sobre tierra y otro sobre el agua
       const L=Math.hypot(tx-cx,ty-cy)||1, ux=(tx-cx)/L, uy=(ty-cy)/L;
@@ -3653,8 +3662,9 @@ function drawSettlement(ctx, b, n, now){
       const a = k*1.7 + b.id + (reduceMotion?0:now/14000*(k%2?1:-1)), r = (ringR + (0.8 + (k%3)*0.5)*SPR)/CELL_PX;
       const hx = b.x + Math.cos(a)*r, hy = b.y + Math.sin(a)*r*0.8;
       if (isWaterAt(hx,hy)) continue;
-      ctx.fillStyle='#f0ece0'; ctx.fillRect(hx*CELL_PX-1.4, hy*CELL_PX-0.8, 2.8, 1.6);
-      ctx.fillStyle='#3a3028'; ctx.fillRect(hx*CELL_PX+(k%2?1.2:-2), hy*CELL_PX-1.2, 0.9, 0.9);
+      const hxs = scrX(hx*CELL_PX);
+      ctx.fillStyle='#f0ece0'; ctx.fillRect(hxs-1.4, hy*CELL_PX-0.8, 2.8, 1.6);
+      ctx.fillStyle='#3a3028'; ctx.fillRect(hxs+(k%2?1.2:-2), hy*CELL_PX-1.2, 0.9, 0.9);
     }
   }
   // bandera de la capital
@@ -3674,7 +3684,7 @@ function updateDrawFx(ctx, now){
   const out=[];
   for (const p of fx){
     const age = Math.max(0,(now-p.t0)/p.life); if (age>=1) continue; out.push(p);
-    const X=p.x*CELL_PX, Y=p.y*CELL_PX;
+    const X=scrX(p.x*CELL_PX), Y=p.y*CELL_PX;
     if (p.k==='smoke'){
       const x = X + p.vx*age*SPR*1.5, y = Y + p.vy*age*SPR*1.5;
       ctx.fillStyle = p.dark ? `rgba(60,56,52,${0.55*(1-age)})` : `rgba(230,226,218,${0.6*(1-age)})`;
@@ -3803,7 +3813,8 @@ function updateShips(dt, now){
 function drawShips(ctx, now, detailed, inView, cssZ){
   ctx.setLineDash([2,2.5]); ctx.lineWidth = detailed ? 0.6 : 1/Math.max(cssZ,0.3);
   for (const sh of ships){ if (sh.mode!=='comercio' || sh.tx==null || sh.sinking) continue;
-    ctx.strokeStyle='rgba(255,246,220,0.28)'; ctx.beginPath(); ctx.moveTo(sh.x*CELL_PX, sh.y*CELL_PX); ctx.lineTo(sh.tx*CELL_PX, sh.ty*CELL_PX); ctx.stroke(); }
+    const sxs=scrX(sh.x*CELL_PX);
+    ctx.strokeStyle='rgba(255,246,220,0.28)'; ctx.beginPath(); ctx.moveTo(sxs, sh.y*CELL_PX); ctx.lineTo(sxs+dxWrap(sh.tx-sh.x)*CELL_PX, sh.ty*CELL_PX); ctx.stroke(); }
   ctx.setLineDash([]);
   for (const sh of ships){
     const alpha = sh.sinking ? Math.max(0, 1-(now-sh.sinking)/1800) : 1;
@@ -3811,12 +3822,12 @@ function drawShips(ctx, now, detailed, inView, cssZ){
     if (inView && !inView(sh.x*CELL_PX, sh.y*CELL_PX)) continue;
     if (detailed===false){
       if (sh.type==='canoa') continue;
-      const u=1/cssZ, X=sh.x*CELL_PX, Y=sh.y*CELL_PX;
+      const u=1/cssZ, X=scrX(sh.x*CELL_PX), Y=sh.y*CELL_PX;
       ctx.globalAlpha=alpha; ctx.fillStyle='rgba(245,240,228,0.95)'; ctx.beginPath(); ctx.moveTo(X,Y-3.2*u); ctx.lineTo(X+2.2*u,Y+0.6*u); ctx.lineTo(X-2.2*u,Y+0.6*u); ctx.fill();
       ctx.fillStyle=sh.color; ctx.fillRect(X-2*u,Y+0.6*u,4*u,1.2*u); ctx.globalAlpha=1;
       continue;
     }
-    const x = sh.x*CELL_PX, y = sh.y*CELL_PX + (reduceMotion?0:Math.sin(now/500+sh.seed*9)*0.4);
+    const x = scrX(sh.x*CELL_PX), y = sh.y*CELL_PX + (reduceMotion?0:Math.sin(now/500+sh.seed*9)*0.4);
     ctx.globalAlpha = alpha;
     ctx.save(); ctx.translate(x,y); ctx.rotate(sh.ang);
     if (sh.type==='vapor' || sh.type==='carguero'){
@@ -3909,7 +3920,7 @@ function drawNukes(ctx, now, cssZ){
   if (!nukes.length) return;
   nukes = nukes.filter(k=>now-k.t0<7000);
   for (const k of nukes){
-    const t = (now-k.t0)/1000, X=k.x*CELL_PX, Y=k.y*CELL_PX, Rr = Math.max(CELL_PX*1.1, 26/cssZ);
+    const t = (now-k.t0)/1000, X=scrX(k.x*CELL_PX), Y=k.y*CELL_PX, Rr = Math.max(CELL_PX*1.1, 26/cssZ);
     if (!LOD.inView(X,Y)) continue;
     if (t<0.5){ ctx.fillStyle=`rgba(255,255,240,${1-t/0.5})`; ctx.beginPath(); ctx.arc(X,Y,Rr*(0.3+t*3),0,TAU); ctx.fill(); }
     if (t<2.5){ ctx.strokeStyle=`rgba(255,240,220,${0.8*(1-t/2.5)})`; ctx.lineWidth=Math.max(1, 2/cssZ); ctx.beginPath(); ctx.arc(X,Y,Rr*(0.4+t*1.4),0,TAU); ctx.stroke(); }
@@ -3937,13 +3948,13 @@ function updateDrawBattles(ctx, dt, now){
     const fighting = now > bt.t0+750;
     // estandartes
     for (const bn of bt.banners){
-      const X=bn.x*CELL_PX, Y=bn.y*CELL_PX, wv = reduceMotion?0:Math.sin(now/220+bn.side)*0.8;
+      const X=scrX(bn.x*CELL_PX), Y=bn.y*CELL_PX, wv = reduceMotion?0:Math.sin(now/220+bn.side)*0.8;
       ctx.fillStyle='#3a2a1a'; ctx.fillRect(X-0.4, Y-7, 0.8, 8);
       ctx.fillStyle=bn.color; ctx.beginPath(); ctx.moveTo(X+0.4,Y-7); ctx.lineTo(X+4.2,Y-6+wv); ctx.lineTo(X+0.4,Y-4.4); ctx.fill();
     }
     // cañones
     for (const g of bt.guns){
-      const X=g.x*CELL_PX, Y=g.y*CELL_PX; g.recoil = Math.max(0, g.recoil-dt*4);
+      const X=scrX(g.x*CELL_PX), Y=g.y*CELL_PX; g.recoil = Math.max(0, g.recoil-dt*4);
       const aim = Math.atan2(bt.my-g.y, bt.mx-g.x);
       ctx.save(); ctx.translate(X - Math.cos(aim)*g.recoil*1.4, Y - Math.sin(aim)*g.recoil*1.4);
       ctx.fillStyle='#5a3a20'; ctx.beginPath(); ctx.arc(-1.2,1.2,1.3,0,TAU); ctx.arc(1.2,1.2,1.3,0,TAU); ctx.fill();
@@ -3951,7 +3962,7 @@ function updateDrawBattles(ctx, dt, now){
       ctx.restore();
       if (fighting && now>g.next && now<bt.t1 && !reduceMotion){
         g.next = now + 900 + Math.random()*800; g.recoil = 1;
-        const bx = X/CELL_PX + Math.cos(aim)*0.5*SF, by = Y/CELL_PX + Math.sin(aim)*0.5*SF;
+        const bx = g.x + Math.cos(aim)*0.5*SF, by = g.y + Math.sin(aim)*0.5*SF;
         addFx({k:'flash',x:bx,y:by,t0:now,life:170,size:2.2}); puff(bx,by,now,2.2,false,1500); puff(bx,by,now,1.6,false,1100);
         const lat = (Math.random()-0.5)*2.4*SF, depth = (0.4+Math.random()*1.2)*SF;
         addFx({k:'ball', x:bx, y:by, tx: bt.mx - bt.ux*g.side*depth + bt.px*lat, ty: bt.my - bt.uy*g.side*depth + bt.py*lat, arc:1.2*SF, t0:now, life:650});
@@ -4067,7 +4078,7 @@ function drawSoldier(ctx, s, bt, now, fighting){
 const DETAIL_ZOOM = 1.1;
 const LOD = {detailed:true, inView:()=>true, font:null};
 function drawSettlementIcon(ctx, b, n, cssZ){
-  const x=b.x*CELL_PX, y=b.y*CELL_PX, u = 1/cssZ;
+  const x=scrX(b.x*CELL_PX), y=b.y*CELL_PX, u = 1/cssZ;
   if (!b.sedentary){
     const s = 3.4*u;
     ctx.fillStyle = n.color; ctx.beginPath(); ctx.moveTo(x-s,y+s*0.7); ctx.lineTo(x,y-s); ctx.lineTo(x+s,y+s*0.7); ctx.closePath(); ctx.fill();
@@ -4088,12 +4099,12 @@ function drawBattleIcons(ctx, now, cssZ){
   fires = fires.filter(f=>now<=f.t1+800);
   const u = 1/cssZ;
   for (const bt of battles){
-    const X=bt.mx*CELL_PX, Y=bt.my*CELL_PX, age=((((now-bt.t0)%900)+900)%900)/900; // now puede venir un poco antes que t0
-    if (!LOD.inView(X,Y)) continue;
+    const X=scrX(bt.mx*CELL_PX), Y=bt.my*CELL_PX, age=((((now-bt.t0)%900)+900)%900)/900; // now puede venir un poco antes que t0
+    if (!LOD.inView(bt.mx*CELL_PX,Y)) continue;
     ctx.beginPath(); ctx.arc(X,Y,(4+age*9)*u,0,TAU); ctx.strokeStyle=`rgba(255,90,50,${0.9*(1-age)})`; ctx.lineWidth=1.5*u; ctx.stroke();
   }
   for (const f of fires){
-    const X=f.x*CELL_PX, Y=f.y*CELL_PX; if (!LOD.inView(X,Y)) continue;
+    const X=scrX(f.x*CELL_PX), Y=f.y*CELL_PX; if (!LOD.inView(f.x*CELL_PX,Y)) continue;
     const g = ctx.createRadialGradient(X,Y,0,X,Y,9*u); g.addColorStop(0,'rgba(255,170,60,0.9)'); g.addColorStop(1,'rgba(255,80,20,0)');
     ctx.fillStyle=g; ctx.beginPath(); ctx.arc(X,Y,9*u,0,TAU); ctx.fill();
   }
@@ -4118,7 +4129,7 @@ function drawMap(now){
   const Wpx = W*CELL_PX, k0 = Math.floor(vx0/Wpx)-1, k1 = Math.floor(vx1/Wpx)+1;
   for (let k=k0;k<=k1;k++) ctx.drawImage(terrainCache, k*Wpx, 0, Wpx, H*CELL_PX);
   if (S && (mapMode==='politico'||mapMode==='culto')) for (let k=k0;k<=k1;k++) ctx.drawImage(overlay, k*Wpx, 0, Wpx, H*CELL_PX);
-  const inView = (x,y)=> x>=vx0 && x<=vx1 && y>=vy0 && y<=vy1;
+  const inView = (x,y)=>{ x=scrX(x); return x>=vx0 && x<=vx1 && y>=vy0 && y<=vy1; };
   LOD.inView = inView;
   if (S){
     if (detailed) drawRoads(ctx);
@@ -4128,7 +4139,7 @@ function drawMap(now){
       const n = bandNation(b); if (!n) continue;
       const ringR = detailed ? drawSettlement(ctx, b, n, now) : drawSettlementIcon(ctx, b, n, cssZ);
       if (S.selected===b.nation){
-        ctx.beginPath(); ctx.arc(b.x*CELL_PX,b.y*CELL_PX,Math.max(ringR+3/cssZ,(b.sedentary?2.2:2.8)*SPR*(detailed?1:0.6)),0,Math.PI*2);
+        ctx.beginPath(); ctx.arc(scrX(b.x*CELL_PX),b.y*CELL_PX,Math.max(ringR+3/cssZ,(b.sedentary?2.2:2.8)*SPR*(detailed?1:0.6)),0,Math.PI*2);
         ctx.strokeStyle='rgba(255,255,255,0.85)'; ctx.lineWidth=1.3/cssZ; ctx.setLineDash([4/cssZ,3/cssZ]); ctx.stroke(); ctx.setLineDash([]);
       }
     }
@@ -4153,14 +4164,14 @@ function drawMap(now){
         const atlas = personAtlas(n.color), tone = (b.nation*7+3)&3, step = reduceMotion ? 0 : Math.floor(now/170);
         for (const p of vis){
           const q = (p.kid?0.72:1)*PQ, sk = (p.k*5+b.id)%6===0 ? (tone+1)&3 : tone, hr = (p.k*7+b.id)%3, fr = (p.mv && ((step+p.k)&1)) ? 1 : 0;
-          ctx.drawImage(atlas, ((sk*3+hr)*2+fr)*PSW, 0, PSW, PSH, p.x*CELL_PX - PSW*q/2, p.y*CELL_PX - (PSH-1.5)*q, PSW*q, PSH*q);
+          ctx.drawImage(atlas, ((sk*3+hr)*2+fr)*PSW, 0, PSW, PSH, scrX(p.x*CELL_PX) - PSW*q/2, p.y*CELL_PX - (PSH-1.5)*q, PSW*q, PSH*q);
         }
       }
     }
     // frentes de guerra
     for (const w_ of S.wars){
       const f = frontFor(w_); if (!f) continue;
-      const x1=f.ba.x*CELL_PX, y1=f.ba.y*CELL_PX, x2=f.bb.x*CELL_PX, y2=f.bb.y*CELL_PX;
+      const x1=scrX(f.ba.x*CELL_PX), y1=f.ba.y*CELL_PX, x2=x1+dxWrap(f.bb.x-f.ba.x)*CELL_PX, y2=f.bb.y*CELL_PX;
       if (!inView(x1,y1) && !inView(x2,y2)) continue;
       ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
       ctx.strokeStyle='rgba(200,40,30,0.7)'; ctx.lineWidth=1.4/cssZ; ctx.setLineDash([5/cssZ,3.5/cssZ]); ctx.stroke(); ctx.setLineDash([]);
@@ -4184,7 +4195,7 @@ function drawMap(now){
     const list = [...S.nations.values()].filter(n=>U(n.pop)>=12 || n.id===S.selected).sort((a,b)=>(b.id===S.selected)-(a.id===S.selected) || b.pop-a.pop);
     for (const n of list){
       const cb = S.bands.get(n.capital); if (!cb) continue;
-      const sx = w/2 + (cb.x*CELL_PX-camera.x)*z, sy = h/2 + (cb.y*CELL_PX-camera.y)*z - Math.max(22*dpr, z*SPR*2.4);
+      const sx = w/2 + (scrX(cb.x*CELL_PX)-camera.x)*z, sy = h/2 + (cb.y*CELL_PX-camera.y)*z - Math.max(22*dpr, z*SPR*2.4);
       if (sx<-50||sy<-20||sx>w+50||sy>h+30) continue;
       const big = U(n.pop)>=150;
       if (!LOD.font) LOD.font = getComputedStyle(document.body).fontFamily;
@@ -4360,10 +4371,10 @@ function drawFigureMarkers(ctx, cssZ){
   const u = 1/cssZ;
   ctx.textAlign='center'; ctx.textBaseline='middle';
   for (const [bid, fs] of byBand){
-    const b = S.bands.get(bid);
+    const b = S.bands.get(bid), bx = scrX(b.x*CELL_PX);
     fs.sort((a,c)=>figScore(c)-figScore(a));
     fs.slice(0,4).forEach((f,i)=>{
-      const x = b.x*CELL_PX + (i-(Math.min(fs.length,4)-1)/2)*20*u, y = b.y*CELL_PX - 3.4*SPR - 4*u;
+      const x = bx + (i-(Math.min(fs.length,4)-1)/2)*20*u, y = b.y*CELL_PX - 3.4*SPR - 4*u;
       ctx.fillStyle='rgba(20,16,10,0.8)'; ctx.beginPath(); ctx.arc(x,y,9*u,0,TAU); ctx.fill();
       ctx.strokeStyle = f.id===selectedFig ? '#fff' : '#e0b84c'; ctx.lineWidth=1.2*u; ctx.stroke();
       ctx.font = `${11*u}px sans-serif`; ctx.fillText(ROLE_ICON[figMainRole(f)], x, y+0.5*u);
@@ -4564,9 +4575,9 @@ function endPointer(e){
     const mx=(sx-mapCanvas.width/2)/camera.zoom+camera.x, my=(sy-mapCanvas.height/2)/camera.zoom+camera.y;
     const mk = (LOD.markers||[]).find(m=>Math.hypot(m.x-mx, m.y-my)<=m.r);
     if (mk){ const f=S.figs.get(mk.id); if (f){ selectedFig=f.id; updateFigures(true); showFigCard(f); } return; }
-    const cx=Math.floor(mx/CELL_PX), cy=Math.floor(my/CELL_PX);
-    let id = (cx>=0&&cy>=0&&cx<W&&cy<H) ? S.owner[cy*W+cx] : -1;
-    if (id<0){ let bd=4; for (const b of S.bands.values()){ const d=Math.hypot(b.x-mx/CELL_PX,b.y-my/CELL_PX); if (d<bd){ bd=d; id=b.nation; } } }
+    const cx=wrapX(Math.floor(mx/CELL_PX)), cy=Math.floor(my/CELL_PX);
+    let id = (cy>=0&&cy<H) ? S.owner[cy*W+cx] : -1;
+    if (id<0){ let bd=4; for (const b of S.bands.values()){ const d=Math.hypot(dxWrap(b.x-mx/CELL_PX),b.y-my/CELL_PX); if (d<bd){ bd=d; id=b.nation; } } }
     selectNation(id>=0 ? id : null);
   }
 }
